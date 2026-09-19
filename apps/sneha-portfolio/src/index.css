@@ -1,25 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  --bg: #fafaf9;
-  --text: #1c1917;
+  --paper: #faf7f2;
+  --paper-2: #f3ede3;
+  --ink: #1c1917;
   --muted: #78716c;
+  --faint: #a8a29e;
   --card: #ffffff;
-  --border: #e7e5e4;
-  --accent: #7c3aed;
-  --accent-ink: #ffffff;
-  --radius: 16px;
+  --border: #e7e0d4;
+  --terracotta: #c14a2e;
+  --sage: #4a6c6f;
+  --clay: #7c5c3e;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --max: 1120px;
   color-scheme: light;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--paper);
+  color: var(--ink);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {
@@ -28,6 +36,9 @@ body {
   flex-direction: column;
 }
 
-a {
-  color: inherit;
+a { color: inherit; }
+
+::selection {
+  background: var(--terracotta);
+  color: #fff;
 }

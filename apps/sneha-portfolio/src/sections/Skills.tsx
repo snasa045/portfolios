@@ -1,15 +1,26 @@
-import { skills } from '../data/portfolio';
+import { skillsGrouped } from '../data/portfolio';
 
 export default function Skills() {
   return (
     <section id="skills" className="section">
-      <span className="eyebrow">02 — Skills</span>
-      <h2>What I work with</h2>
-      <ul className="pill-list">
-        {skills.map((s) => (
-          <li key={s}>{s}</li>
+      <div className="section-head">
+        <h2>
+          Capabilities, <em>not just tools</em>
+        </h2>
+        <p>Research to documentation — methods I can show in case studies.</p>
+      </div>
+      <div className="skill-groups">
+        {skillsGrouped.map((g) => (
+          <div key={g.title} className="skill-group">
+            <h4>{g.title}</h4>
+            <ul className="pill-list">
+              {g.items.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }

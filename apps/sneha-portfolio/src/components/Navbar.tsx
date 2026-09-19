@@ -1,11 +1,10 @@
-import { navLinks, profile } from '../data/portfolio';
+import { navLinks } from '../data/portfolio';
 
 export default function Navbar() {
   return (
     <header className="nav">
       <a href="#top" className="brand">
-        {profile.name}
-        <span className="brand-dot">.</span>
+        Sneha Jadhav <em>©</em>
       </a>
       <nav>
         {navLinks.map((l) => (
