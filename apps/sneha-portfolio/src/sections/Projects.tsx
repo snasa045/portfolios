@@ -1,4 +1,5 @@
-import { projects } from '../data/portfolio';
+import { projects, projectGallery, assetUrl } from '../data/portfolio';
+import { Link } from 'react-router-dom';
 
 export default function Projects() {
   return (
@@ -13,25 +14,35 @@ export default function Projects() {
         </p>
       </div>
       <div className="work-list">
-        {projects.map((p) => (
-          <article
-            key={p.title}
-            className="work-card"
-            style={{ ['--accent' as string]: p.accent }}
-          >
-            <span className="work-meta">{p.meta}</span>
-            <h3>{p.title}</h3>
-            <p className="work-outcome">{p.outcome}</p>
-            <p className="work-desc">{p.description}</p>
-            <div className="tags">
-              {p.tags.map((t) => (
-                <span key={t} className="tag">
-                  {t}
-                </span>
-              ))}
-            </div>
-          </article>
-        ))}
+        {projects.map((p) => {
+          const image = projectGallery[p.slug]?.[0];
+          return (
+            <article
+              key={p.slug}
+              className="work-card"
+              style={{ ['--accent' as string]: p.accent }}
+            >
+              <Link to={`/project/${p.slug}`} className="work-card-link">
+                {image && (
+                  <div className="work-thumb">
+                    <img src={assetUrl(image)} alt="" loading="lazy" />
+                  </div>
+                )}
+                <div className="work-content">
+                  <span className="work-meta">{p.meta}</span>
+                  <h3>{p.title}</h3>
+                  <p className="work-outcome">{p.outcome}</p>
+                  <p className="work-desc">{p.description}</p>
+                  <div className="tags">
+                    {p.tags.map((t) => (
+                      <span key={t} className="tag">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
