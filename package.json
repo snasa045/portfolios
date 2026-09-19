@@ -1,0 +1,17 @@
+{
+  "name": "portfolios",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Monorepo for Sneha and Sid portfolios",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:sneha": "npm run dev --workspace=sneha-portfolio",
+    "dev:sid": "npm run dev --workspace=sid-portfolio",
+    "build:sneha": "npm run build --workspace=sneha-portfolio",
+    "build:sid": "npm run build --workspace=sid-portfolio",
+    "build:all": "npm run build --workspaces"
+  }
+}
