@@ -1,7 +1,7 @@
 # Deploys Sneha's Vite portfolio to GitHub Pages (project site).
-# Result: https://snasa045.github.io/portfolios/
+# Result: https://snasa045.github.io/portfolios/sneha/
+# (Root /portfolios/ redirects there; leaves room for /portfolios/sid/ later.)
 # Requires: repo Settings -> Pages -> Source = "GitHub Actions".
-# Note: on a free GitHub plan the repo must be public for Pages.
 name: Deploy Sneha portfolio to Pages
 
 on:
@@ -32,9 +32,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build --workspace=sneha-portfolio
+      - name: Stage Pages artifact under sneha/ subpath
+        run: |
+          mkdir -p pages/sneha
+          cp -r apps/sneha-portfolio/dist/* pages/sneha/
+          printf '%s\n' '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=./sneha/"><link rel="canonical" href="./sneha/"></head><body><p>Redirecting to <a href="./sneha/">Sneha&rsquo;s portfolio</a>&hellip;</p></body></html>' > pages/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/sneha-portfolio/dist
+          path: pages
 
   deploy:
     needs: build
