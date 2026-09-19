@@ -39,3 +39,5 @@ yarn-error.log*
 .env.local
 .env.*.local
 
+# Local raw assets - never commit (Sneha's personal data dump)
+apps/sneha-portfolio/assets/Sneha's MacBook Air Data/
