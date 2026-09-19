@@ -41,3 +41,6 @@ yarn-error.log*
 
 # Local raw assets - never commit (Sneha's personal data dump)
 apps/sneha-portfolio/assets/Sneha's MacBook Air Data/
+
+# Curated portfolio source assets (large raw design files, not for git)
+apps/sneha-portfolio/assets/portfolio-source/
