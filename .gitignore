@@ -50,3 +50,6 @@ apps/sneha-portfolio/assets/*.docx
 
 # Local browser-testing screenshots
 .playwright-mcp/
+
+# Superpowers brainstorming scratch
+.superpowers/

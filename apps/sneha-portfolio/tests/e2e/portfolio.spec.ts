@@ -1,4 +1,5 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { supportingProjects } from '../../src/data/projects';
 
 const basePath = '/portfolios/sneha/';
 const siteOrigin = 'https://snasa045.github.io';
@@ -185,6 +186,192 @@ test('case studies use one immersive shell with project-specific themes', async 
     await expect(page.locator('.case-decision')).toBeVisible();
     await expect(page.locator('.case-closing')).toBeVisible();
     await expect(page.locator('.next-case')).toBeVisible();
+  }
+});
+
+test('earlier work opens in the distinctive archive desk structure', async ({ page }) => {
+  const project = supportingProjects[0];
+  await page.goto(basePath);
+  await page.getByRole('button', { name: `${project.title} — read the full story` }).click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator('.supporting-archive-spine')).toBeVisible();
+  await expect(dialog.locator('.supporting-archive-desk')).toBeVisible();
+  await expect(dialog.locator('.supporting-evidence-sheet')).toHaveCount(
+    project.sections.length + 2,
+  );
+  await expect(dialog.getByRole('heading', { name: 'Project contents' })).toBeAttached();
+  await expect(dialog.getByRole('navigation', { name: `${project.title} contents` })).toHaveCount(0);
+  await expect(dialog.locator('.case-hero')).toHaveCount(0);
+  await expect(dialog.locator('.case-chapter-nav')).toHaveCount(0);
+});
+
+test('archive desk preserves every supporting project detail and image', async ({ page }) => {
+  await page.goto(basePath);
+
+  for (const project of supportingProjects) {
+    await page.getByRole('button', { name: `${project.title} — read the full story` }).click();
+    const dialog = page.getByRole('dialog');
+
+    await expect(dialog.getByRole('heading', { name: project.title })).toBeVisible();
+    await expect(dialog.getByText(project.context, { exact: true })).toBeVisible();
+    await expect(dialog.getByText(project.role, { exact: true })).toBeVisible();
+    await expect(dialog.getByText(project.timeframe, { exact: true })).toBeVisible();
+    await expect(dialog.getByRole('img', { name: project.cover.alt })).toBeVisible();
+    if (project.cover.caption) {
+      await expect(dialog.getByText(project.cover.caption, { exact: true })).toBeVisible();
+    }
+
+    for (const section of project.sections) {
+      if (section.heading) {
+        await expect(dialog.getByRole('heading', { name: section.heading })).toBeVisible();
+      }
+      if (section.kind === 'text') {
+        for (const paragraph of section.body) {
+          await expect(dialog.getByText(paragraph, { exact: true })).toBeVisible();
+        }
+      } else if (section.kind === 'figure') {
+        await expect(dialog.getByRole('img', { name: section.figure.alt })).toBeVisible();
+        if (section.figure.caption) {
+          await expect(dialog.getByText(section.figure.caption, { exact: true })).toBeVisible();
+        }
+      }
+    }
+
+    for (const outcome of project.outcomes) {
+      const item = dialog.locator('.supporting-dialog-outcomes li').filter({ hasText: outcome.label });
+      await expect(item).toHaveCount(1);
+      if (outcome.value) await expect(item).toContainText(outcome.value);
+      if (outcome.kind !== 'result') await expect(item).toContainText(`(${outcome.kind})`);
+    }
+
+    await dialog.getByRole('button', { name: `Close ${project.title}` }).click();
+    await expect(dialog).toBeHidden();
+  }
+});
+
+test('archive imagery keeps its intrinsic aspect ratio at constrained heights', async ({ page }) => {
+  await page.goto(basePath);
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+
+  for (const width of [760, 1280]) {
+    await page.setViewportSize({ width, height: 720 });
+    for (const [name, expectedRatio] of [
+      ['figo-cover', 2443 / 1691],
+      ['figo-testing', 1560 / 1970],
+    ] as const) {
+      const renderedRatio = await page.locator(`[data-media="${name}"] img`).evaluate((image) => {
+        const bounds = image.getBoundingClientRect();
+        return bounds.width / bounds.height;
+      });
+      expect(renderedRatio).toBeCloseTo(expectedRatio, 2);
+    }
+  }
+});
+
+test('archive close control has a visible WCAG focus indicator', async ({ page }) => {
+  await page.goto(basePath);
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+  const close = page.getByRole('button', { name: 'Close Figo Friend' });
+  await page.keyboard.press('Tab');
+  await expect(close).toBeFocused();
+
+  const colors = await close.evaluate((button) => ({
+    indicator: getComputedStyle(button).outlineColor,
+    adjacent: getComputedStyle(button.closest('.supporting-archive-spine')!).backgroundColor,
+  }));
+
+  expect(contrastRatio(colors.indicator, colors.adjacent)).toBeGreaterThanOrEqual(3);
+});
+
+test('archive spine fills the full dialog viewport on tall screens', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 950 });
+  await page.goto(basePath);
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+  await expect(page.getByRole('dialog')).not.toHaveClass(/is-animating/);
+
+  const bounds = await page.getByRole('dialog').evaluate((dialog) => {
+    const panel = dialog.getBoundingClientRect();
+    const spine = dialog.querySelector('.supporting-archive-spine')!.getBoundingClientRect();
+    return { panelTop: panel.top, panelBottom: panel.bottom, spineTop: spine.top, spineBottom: spine.bottom };
+  });
+
+  expect(Math.abs(bounds.spineTop - bounds.panelTop)).toBeLessThanOrEqual(1);
+  expect(Math.abs(bounds.spineBottom - bounds.panelBottom)).toBeLessThanOrEqual(1);
+});
+
+test('archive evidence sheets use the portfolio card radius', async ({ page }) => {
+  await page.goto(basePath);
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+
+  await expect(page.locator('.supporting-evidence-sheet').first()).toHaveCSS(
+    'border-radius',
+    '14px',
+  );
+});
+
+test('archive card overlaps the rounded title tab and meets WCAG AA contrast', async ({
+  page,
+}) => {
+  await page.goto(basePath);
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+
+  const geometry = await page.locator('.supporting-archive-desk').evaluate((desk) => {
+    const tabElement = desk.querySelector('.supporting-archive-tab')!;
+    const cardElement = desk.querySelector('.supporting-evidence-sheet')!;
+    const tab = getComputedStyle(tabElement);
+    const extension = getComputedStyle(tabElement, '::after');
+    const card = getComputedStyle(cardElement);
+    const tabBounds = tabElement.getBoundingClientRect();
+    const cardBounds = cardElement.getBoundingClientRect();
+    return {
+      tabCurve: tab.borderBottomLeftRadius,
+      cardCurve: card.borderTopLeftRadius,
+      extensionContent: extension.content,
+      overlap: tabBounds.bottom - cardBounds.top,
+      background: tab.backgroundColor,
+      foreground: tab.color,
+    };
+  });
+
+  expect(geometry.tabCurve).toBe(geometry.cardCurve);
+  expect(geometry.extensionContent).toBe('none');
+  expect(geometry.overlap).toBe(28);
+  expect(contrastRatio(geometry.background, geometry.foreground)).toBeGreaterThanOrEqual(4.5);
+});
+
+test('archive spine uses the accessible ink palette', async ({ page }) => {
+  await page.goto(basePath);
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+
+  const dialog = page.getByRole('dialog');
+  const spine = dialog.locator('.supporting-archive-spine');
+  await expect(spine).toHaveCSS('background-color', 'rgb(28, 25, 23)');
+  await expect(spine).toHaveCSS('color', 'rgb(250, 247, 242)');
+  await expect(dialog.locator('.supporting-archive-file')).toHaveCSS(
+    'color',
+    'rgb(233, 163, 142)',
+  );
+});
+
+test('long archive titles stay inside the project-file spine', async ({ page }) => {
+  await page.goto(basePath);
+
+  for (const width of [390, 760, 761, 1280]) {
+    await page.setViewportSize({ width, height: 720 });
+    for (const title of ['PatientsFirst', '[24]7.ai conversation design']) {
+      await page.getByRole('button', { name: `${title} — read the full story` }).click();
+      const bounds = await page.locator('.supporting-archive-spine').evaluate((spine) => {
+        const heading = spine.querySelector('h2')!.getBoundingClientRect();
+        const container = spine.getBoundingClientRect();
+        return { headingRight: heading.right, containerRight: container.right };
+      });
+
+      expect(bounds.headingRight).toBeLessThanOrEqual(bounds.containerRight);
+      await page.getByRole('button', { name: `Close ${title}` }).click();
+      await expect(page.getByRole('dialog')).toBeHidden();
+    }
   }
 });
 

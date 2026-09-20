@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { assetUrl, navLinks, profile } from '../data/portfolio';
+import useActiveSection from '../lib/useActiveSection';
+
+const sectionIds = navLinks.map((l) => l.href.slice(1));
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const active = useActiveSection(sectionIds, pathname === '/');
 
   useEffect(() => {
     if (!open) return;
@@ -64,6 +68,7 @@ export default function Navbar() {
           <a
             key={l.href}
             href={l.href}
+            aria-current={active === l.href.slice(1) ? 'true' : undefined}
             onClick={(e) => {
               e.preventDefault();
               goToSection(l.href);

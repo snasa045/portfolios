@@ -119,50 +119,103 @@ export default function SupportingDialog({ project, origin, onClose }: Props) {
     >
       {project && (
         <article className="supporting-dialog-body" ref={bodyRef} tabIndex={-1}>
-          <button
-            type="button"
-            className="supporting-dialog-close"
-            onClick={requestClose}
-            aria-label={`Close ${project.title}`}
-          >
-            <span aria-hidden="true">×</span>
-          </button>
-
-          <header className="supporting-dialog-head">
-            <p className="supporting-meta">
-              <span className={`status status-${project.status}`}>
-                {statusLabel[project.status]}
-              </span>
-              <span>{project.timeframe}</span>
-            </p>
-            <h2 id="supporting-dialog-title">{project.title}</h2>
-            <p className="supporting-dialog-context">{project.context}</p>
-            <p className="supporting-dialog-role">{project.role}</p>
-          </header>
-
-          <ProjectMedia figure={project.cover} className="supporting-dialog-cover" eager />
-
-          {project.sections.map((section, index) => (
-            <section
-              key={section.heading ?? index}
-              className={isMediaSection(section) ? 'case-media-stage' : undefined}
+          <aside className="supporting-archive-spine">
+            <button
+              type="button"
+              className="supporting-dialog-close"
+              onClick={requestClose}
+              aria-label={`Close ${project.title}`}
             >
-              {section.heading && <h3>{section.heading}</h3>}
-              <SectionBody section={section} />
-            </section>
-          ))}
+              <span aria-hidden="true">×</span>
+            </button>
 
-          <section className="supporting-dialog-outcomes">
-            <h3>What came of it</h3>
-            <ul>
-              {project.outcomes.map((outcome) => (
-                <li key={outcome.label}>
-                  {outcome.value && <strong>{outcome.value}</strong>} {outcome.label}
-                  {outcome.kind !== 'result' && <em> ({outcome.kind})</em>}
+            <header className="supporting-dialog-head">
+              <p className="supporting-archive-file">Project file</p>
+              <h2
+                id="supporting-dialog-title"
+                className={
+                  project.title.split(/\s+/).some((word) => word.length >= 10)
+                    ? 'supporting-dialog-title-compact'
+                    : undefined
+                }
+              >
+                {project.title}
+              </h2>
+              <p className="supporting-meta">
+                <span className={`status status-${project.status}`}>
+                  {statusLabel[project.status]}
+                </span>
+                <span>{project.timeframe}</span>
+              </p>
+              <p className="supporting-dialog-context">{project.context}</p>
+              <p className="supporting-dialog-role">{project.role}</p>
+            </header>
+
+            <section
+              className="supporting-archive-index"
+              aria-labelledby={`supporting-${project.id}-contents`}
+            >
+              <h3 className="sr-only" id={`supporting-${project.id}-contents`}>
+                Project contents
+              </h3>
+              <ol>
+                {project.sections.map((section, index) => (
+                  <li key={section.heading ?? index}>
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    {section.heading ?? 'Project artifact'}
+                  </li>
+                ))}
+                <li>
+                  <span>{String(project.sections.length + 1).padStart(2, '0')}</span>
+                  What came of it
                 </li>
-              ))}
-            </ul>
-          </section>
+              </ol>
+            </section>
+          </aside>
+
+          <div className="supporting-archive-desk">
+            <div className="supporting-archive-tab" aria-hidden="true">
+              {project.title}
+            </div>
+
+            <section className="supporting-evidence-sheet supporting-archive-cover">
+              <ProjectMedia figure={project.cover} eager />
+            </section>
+
+            {project.sections.map((section, index) => (
+              <section
+                key={section.heading ?? index}
+                className={`supporting-evidence-sheet${
+                  isMediaSection(section) ? ' supporting-evidence-media' : ''
+                }`}
+              >
+                <span className="supporting-evidence-number" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div className="supporting-evidence-content">
+                  {section.heading && <h3>{section.heading}</h3>}
+                  <SectionBody section={section} />
+                </div>
+              </section>
+            ))}
+
+            <section className="supporting-evidence-sheet supporting-dialog-outcomes">
+              <span className="supporting-evidence-number" aria-hidden="true">
+                {String(project.sections.length + 1).padStart(2, '0')}
+              </span>
+              <div className="supporting-evidence-content">
+                <h3>What came of it</h3>
+                <ul>
+                  {project.outcomes.map((outcome) => (
+                    <li key={outcome.label}>
+                      {outcome.value && <strong>{outcome.value}</strong>} {outcome.label}
+                      {outcome.kind !== 'result' && <em> ({outcome.kind})</em>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          </div>
         </article>
       )}
     </dialog>

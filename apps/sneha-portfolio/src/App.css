@@ -123,11 +123,29 @@ a { color: inherit; }
   text-transform: uppercase;
 }
 .nav-links a {
+  position: relative;
   color: var(--muted);
   text-decoration: none;
   transition: color var(--ease);
 }
 .nav-links a:hover { color: var(--ink); }
+
+/* Section links get a growing rule; .nav-resume is excluded — it owns a static underline. */
+.nav-links a:not(.nav-resume)::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.45rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--terracotta);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--ease);
+}
+.nav-links a[aria-current] { color: var(--terracotta); }
+.nav-links a[aria-current]::after { transform: scaleX(1); }
 .nav-links a.nav-resume { color: var(--ink); border-bottom: 1px solid var(--line); }
 .nav-links a.nav-resume:hover { border-bottom-color: var(--terracotta); color: var(--terracotta); }
 
@@ -583,12 +601,12 @@ h3 { font-size: var(--step-h3); }
 
 .supporting-dialog {
   --flip: 700ms cubic-bezier(0.34, 1.1, 0.64, 1);
-  width: min(56rem, calc(100vw - 2rem));
-  max-height: min(90vh, 56rem);
+  width: min(76rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
   padding: 0;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
+  border: 1px solid #cfc5b7;
+  border-radius: 1.25rem;
+  background: #e8e1d7;
   color: var(--ink);
   overflow: auto;
   overscroll-behavior: contain;
@@ -637,61 +655,209 @@ h3 { font-size: var(--step-h3); }
 
 .supporting-dialog-body {
   display: grid;
-  gap: 2.5rem;
-  padding: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: minmax(15rem, 0.32fr) minmax(0, 1fr);
+  min-height: calc(100dvh - 2rem);
+  background: #f3eadf;
 }
-.supporting-dialog-body > section { display: grid; gap: 1rem; }
-.supporting-dialog-body h3 { font-size: clamp(1.15rem, 2vw, 1.4rem); }
-.supporting-dialog-body .case-chapter-copy { max-width: var(--measure); }
-.supporting-dialog-body .case-chapter-copy p + p { margin-top: 1rem; }
-/* The case-study page opens each section with an oversized lede; at modal width that reads as shouting. */
-.supporting-dialog-body .case-chapter-copy p,
-.supporting-dialog-body .case-chapter-copy p:first-child { font-size: 1.0625rem; }
-.supporting-dialog-cover img {
-  width: 100%;
-  max-height: 60vh;
-  object-fit: contain;
-  background: var(--surface);
-  border-radius: var(--radius);
-}
-.supporting-dialog .case-media-stage .media img { max-height: 68vh; }
-
-.supporting-dialog-close {
+.supporting-archive-spine {
   position: sticky;
   top: 0;
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  min-height: calc(100dvh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  overflow-y: auto;
+  background: var(--ink);
+  color: var(--ivory);
+}
+.supporting-dialog-head {
+  display: grid;
+  gap: 0.85rem;
+  margin-top: clamp(2.75rem, 8vh, 5rem);
+}
+.supporting-archive-file {
+  margin: 0;
+  color: #e9a38e;
+  font-size: 0.8rem;
+}
+.supporting-dialog-head h2 {
+  max-width: 9ch;
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+}
+.supporting-dialog-head .supporting-dialog-title-compact {
+  max-width: none;
+  font-size: clamp(2rem, 3vw, 2.4rem);
+}
+.supporting-dialog-head .supporting-meta {
+  display: grid;
+  justify-items: start;
+  margin: 0;
+  color: #d9cec5;
+}
+.supporting-dialog-head .status {
+  border-color: rgba(250, 247, 242, 0.36);
+  background: rgba(250, 247, 242, 0.08);
+  color: var(--ivory);
+}
+.supporting-dialog-context {
+  margin: 0;
+  color: #d9cec5;
+  font-size: 0.95rem;
+}
+.supporting-dialog-role {
+  margin: 0;
+  color: #e9a38e;
+  font-size: var(--step-small);
+}
+.supporting-archive-index { margin-top: auto; padding-top: 2rem; }
+.supporting-archive-index ol { margin: 0; padding: 0; list-style: none; }
+.supporting-archive-index li {
+  display: grid;
+  grid-template-columns: 1.7rem 1fr;
+  gap: 0.55rem;
+  padding: 0.65rem 0;
+  border-top: 1px solid rgba(250, 247, 242, 0.16);
+  color: #d9cec5;
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+.supporting-archive-index li span { color: #e9a38e; }
+
+.supporting-archive-desk {
+  min-width: 0;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)),
+    #e8e1d7;
+}
+.supporting-archive-tab {
+  position: relative;
   z-index: 1;
-  justify-self: end;
+  width: fit-content;
+  min-width: min(18rem, 72%);
+  padding: 0.75rem 1rem calc(1rem + var(--radius));
+  border-radius: var(--radius);
+  background: #a83e26;
+  color: #fff;
+  font-size: 0.78rem;
+}
+.supporting-evidence-sheet {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: clamp(1rem, 2.5vw, 2rem);
+  padding: clamp(1.5rem, 3.5vw, 3rem);
+  border: 1px solid #d7cfc3;
+  border-radius: var(--radius);
+  background: #fffdf8;
+  box-shadow: 0 12px 30px rgba(55, 43, 32, 0.1);
+}
+.supporting-evidence-sheet + .supporting-evidence-sheet { margin-top: 1.2rem; }
+.supporting-archive-cover {
+  z-index: 2;
+  display: block;
+  margin-top: calc(0px - var(--radius) - var(--radius));
+  padding: clamp(0.75rem, 1.5vw, 1.2rem);
+}
+.supporting-archive-cover .media img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 72vh;
+  margin-inline: auto;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  background: #fffdf8;
+}
+.supporting-evidence-number {
+  color: #a83e26;
+  font-family: Fraunces, Georgia, serif;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  line-height: 1;
+}
+.supporting-evidence-content { min-width: 0; }
+.supporting-evidence-content h3 {
+  max-width: 24ch;
+  margin-bottom: 1rem;
+  font-size: clamp(1.45rem, 2.5vw, 2.15rem);
+}
+.supporting-evidence-content .case-chapter-copy { max-width: var(--measure); }
+.supporting-evidence-content .case-chapter-copy p,
+.supporting-evidence-content .case-chapter-copy p:first-child { font-size: 1.0625rem; }
+.supporting-evidence-content .case-chapter-copy p + p { margin-top: 1rem; }
+.supporting-evidence-media { display: block; }
+.supporting-evidence-media .supporting-evidence-number { display: block; margin-bottom: 0.85rem; }
+.supporting-evidence-media .media img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 74vh;
+  margin-inline: auto;
+  object-fit: contain;
+  border-radius: 0;
+  background: #fffdf8;
+}
+.supporting-evidence-media figcaption { max-width: 68ch; }
+
+.supporting-dialog-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 2;
+  align-self: flex-end;
   width: 2.25rem;
   height: 2.25rem;
-  margin-bottom: -2.5rem;
   display: grid;
   place-items: center;
   font-size: 1.5rem;
   line-height: 1;
-  color: var(--muted);
-  background: var(--surface);
-  border: 1px solid var(--line);
+  color: var(--ivory);
+  background: transparent;
+  border: 1px solid rgba(250, 247, 242, 0.36);
   border-radius: 999px;
   cursor: pointer;
   transition: color var(--ease), border-color var(--ease);
 }
 .supporting-dialog-close:hover {
-  color: var(--ink);
-  border-color: color-mix(in srgb, var(--terracotta) 45%, var(--line));
+  color: #e9a38e;
+  border-color: #e9a38e;
 }
-
-.supporting-dialog-head { display: grid; gap: 0.75rem; max-width: var(--measure); }
-.supporting-dialog-head h2 { margin: 0; font-size: clamp(1.6rem, 3.5vw, 2.4rem); }
-.supporting-dialog-head .supporting-meta { margin: 0; }
-.supporting-dialog-context { color: var(--muted); margin: 0; }
-.supporting-dialog-role {
-  margin: 0;
-  font-size: var(--step-small);
-  color: var(--terracotta);
-}
-
-.supporting-dialog-outcomes ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.6rem; }
+.supporting-dialog-close:focus-visible { outline-color: #e9a38e; }
+.supporting-dialog-outcomes ul { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.supporting-dialog-outcomes li { padding: 0.75rem 0; border-top: 1px solid #ddd5ca; }
+.supporting-dialog-outcomes li:first-child { border-top: 0; }
+.supporting-dialog-outcomes strong { color: #a83e26; font-family: Fraunces, Georgia, serif; font-size: 1.3rem; }
 .supporting-dialog-outcomes em { color: var(--muted); font-size: 0.875rem; }
+
+@media (max-width: 760px) {
+  .supporting-dialog {
+    width: calc(100vw - 1rem);
+    max-height: calc(100dvh - 1rem);
+    border-radius: 0.9rem;
+  }
+  .supporting-dialog-body { grid-template-columns: 1fr; min-height: 0; }
+  .supporting-archive-spine {
+    position: relative;
+    min-height: 0;
+    max-height: none;
+    padding: 1.5rem;
+    overflow: visible;
+  }
+  .supporting-dialog-head { margin-top: 2.75rem; }
+  .supporting-dialog-head h2 { max-width: 12ch; }
+  .supporting-archive-index { margin-top: 1.5rem; padding-top: 0; }
+  .supporting-archive-index ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .supporting-archive-index li { padding-right: 0.65rem; }
+  .supporting-archive-desk { padding: 0.75rem; }
+  .supporting-archive-tab { min-width: 62%; }
+  .supporting-evidence-sheet { grid-template-columns: 1fr; gap: 0.8rem; padding: 1.35rem; }
+  .supporting-evidence-content h3 { font-size: clamp(1.35rem, 7vw, 1.8rem); }
+  .supporting-dialog-close { top: 1.2rem; right: 1.2rem; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .supporting-dialog[open]::backdrop,
@@ -707,7 +873,6 @@ h3 { font-size: var(--step-h3); }
   display: grid;
   grid-template-columns: 1.5fr 1fr;
   gap: clamp(2rem, 5vw, 4rem);
-  margin-bottom: var(--gap-section);
 }
 .about-story p { max-width: var(--measure); }
 .about-story p:first-of-type {
@@ -812,17 +977,73 @@ h3 { font-size: var(--step-h3); }
 
 /* ---------- contact ---------- */
 
-.section-contact { text-align: center; }
-.section-contact h2 { font-size: var(--step-h2); margin-bottom: 0.75rem; }
-.section-contact > p { color: var(--muted); max-width: 48ch; margin-inline: auto; }
+.contact-panel {
+  /* Clay is darker than the page, so brand terracotta lands at 4.1:1 here — under AA. */
+  --accent-on-clay: #b23f24;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(2.25rem, 5.5vw, 4.25rem) clamp(1.5rem, 4.5vw, 4rem);
+  border-radius: clamp(20px, 3vw, 32px);
+  background: #f3eadf;
+}
+/* The hero's blob and orbit ring again, so the page closes on the shape it opened with. */
+.contact-blob {
+  position: absolute;
+  inset: -14% -22% -18% 44%;
+  z-index: -1;
+  border-radius: 46% 54% 61% 39% / 45% 40% 60% 55%;
+  background:
+    radial-gradient(circle at 34% 32%, rgba(193, 74, 46, 0.24), transparent 46%),
+    radial-gradient(circle at 74% 70%, rgba(74, 108, 111, 0.12), transparent 44%);
+  transform: rotate(-8deg);
+}
+.contact-orbit {
+  position: absolute;
+  inset: 8% 6% 12% 52%;
+  z-index: -1;
+  border: 1px solid color-mix(in srgb, var(--terracotta) 32%, transparent);
+  border-radius: 50%;
+  transform: rotate(16deg);
+}
+/* Wide enough that the pill row never wraps; .contact-note holds the reading measure. */
+.contact-panel-inner { position: relative; max-width: 52rem; }
+
+.contact-eyebrow {
+  margin: 0 0 1rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-on-clay);
+}
+.section-contact h2 {
+  margin: 0 0 1rem;
+  font-size: var(--step-hero);
+}
+.contact-note {
+  margin: 0;
+  max-width: 40ch;
+  color: var(--muted);
+}
+
 .contact-actions {
   display: flex;
-  justify-content: center;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin: 2rem 0 1.25rem;
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
 }
-.contact-meta { font-size: var(--step-small); color: var(--muted); }
+.contact-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.contact-icon { width: 1.05em; height: 1.05em; flex: none; }
+.contact-arrow { transition: transform var(--ease); }
+.contact-actions .btn:hover .contact-arrow,
+.contact-actions .btn:focus-visible .contact-arrow { transform: translateX(3px); }
+/* Only the external links carry ↗, so let those travel on the diagonal instead. */
+.contact-actions .btn[target]:hover .contact-arrow,
+.contact-actions .btn[target]:focus-visible .contact-arrow { transform: translate(2px, -2px); }
 
 /* ---------- case study ---------- */
 
@@ -1163,6 +1384,9 @@ h3 { font-size: var(--step-h3); }
   .project-right .project-body,
   .project-right .media { order: initial; }
   .about-grid { grid-template-columns: 1fr; }
+  /* Copy now runs the full panel width, so pull the artwork clear of it. */
+  .contact-blob { inset: 34% -30% -34% 34%; }
+  .contact-orbit { display: none; }
   .comparison { grid-template-columns: 1fr; }
   .case-hero { grid-template-columns: 1fr; min-height: 0; }
   .case-hero-copy { min-height: 610px; }
@@ -1235,6 +1459,8 @@ h3 { font-size: var(--step-h3); }
     padding: 0.85rem 0;
     border-top: 1px solid var(--line);
   }
+  /* Stacked rows already have separators — the rule would read as one. Colour alone here. */
+  .nav-links a:not(.nav-resume)::after { display: none; }
   .case-world { padding-top: 0.75rem; }
   .case-hero-copy { min-height: 560px; }
   .case-hero-statement { font-size: clamp(2.8rem, 14vw, 4.5rem); }
