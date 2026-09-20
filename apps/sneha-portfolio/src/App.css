@@ -744,23 +744,32 @@ h3 { font-size: var(--step-h3); }
   color: #fff;
   font-size: 0.78rem;
 }
+.supporting-archive-paper {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(0px - var(--radius) - var(--radius));
+  overflow: hidden;
+  border: 1px solid #d7cfc3;
+  border-radius: var(--radius);
+  background: #fffdf8;
+  box-shadow: 0 12px 30px rgba(55, 43, 32, 0.1);
+}
 .supporting-evidence-sheet {
   position: relative;
   display: grid;
   grid-template-columns: 3.5rem minmax(0, 1fr);
   gap: clamp(1rem, 2.5vw, 2rem);
   padding: clamp(1.5rem, 3.5vw, 3rem);
-  border: 1px solid #d7cfc3;
-  border-radius: var(--radius);
-  background: #fffdf8;
-  box-shadow: 0 12px 30px rgba(55, 43, 32, 0.1);
+  border-top: 1px solid #e4ddd2;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
-.supporting-evidence-sheet + .supporting-evidence-sheet { margin-top: 1.2rem; }
 .supporting-archive-cover {
-  z-index: 2;
   display: block;
-  margin-top: calc(0px - var(--radius) - var(--radius));
   padding: clamp(0.75rem, 1.5vw, 1.2rem);
+  border-top: 0;
+  border-bottom: 1px solid #e4ddd2;
 }
 .supporting-archive-cover .media img {
   width: auto;

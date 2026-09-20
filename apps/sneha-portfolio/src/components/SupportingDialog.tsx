@@ -178,43 +178,45 @@ export default function SupportingDialog({ project, origin, onClose }: Props) {
               {project.title}
             </div>
 
-            <section className="supporting-evidence-sheet supporting-archive-cover">
-              <ProjectMedia figure={project.cover} eager />
-            </section>
+            <div className="supporting-archive-paper">
+              <section className="supporting-evidence-sheet supporting-archive-cover">
+                <ProjectMedia figure={project.cover} eager />
+              </section>
 
-            {project.sections.map((section, index) => (
-              <section
-                key={section.heading ?? index}
-                className={`supporting-evidence-sheet${
-                  isMediaSection(section) ? ' supporting-evidence-media' : ''
-                }`}
-              >
+              {project.sections.map((section, index) => (
+                <section
+                  key={section.heading ?? index}
+                  className={`supporting-evidence-sheet${
+                    isMediaSection(section) ? ' supporting-evidence-media' : ''
+                  }`}
+                >
+                  <span className="supporting-evidence-number" aria-hidden="true">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div className="supporting-evidence-content">
+                    {section.heading && <h3>{section.heading}</h3>}
+                    <SectionBody section={section} />
+                  </div>
+                </section>
+              ))}
+
+              <section className="supporting-evidence-sheet supporting-dialog-outcomes">
                 <span className="supporting-evidence-number" aria-hidden="true">
-                  {String(index + 1).padStart(2, '0')}
+                  {String(project.sections.length + 1).padStart(2, '0')}
                 </span>
                 <div className="supporting-evidence-content">
-                  {section.heading && <h3>{section.heading}</h3>}
-                  <SectionBody section={section} />
+                  <h3>What came of it</h3>
+                  <ul>
+                    {project.outcomes.map((outcome) => (
+                      <li key={outcome.label}>
+                        {outcome.value && <strong>{outcome.value}</strong>} {outcome.label}
+                        {outcome.kind !== 'result' && <em> ({outcome.kind})</em>}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </section>
-            ))}
-
-            <section className="supporting-evidence-sheet supporting-dialog-outcomes">
-              <span className="supporting-evidence-number" aria-hidden="true">
-                {String(project.sections.length + 1).padStart(2, '0')}
-              </span>
-              <div className="supporting-evidence-content">
-                <h3>What came of it</h3>
-                <ul>
-                  {project.outcomes.map((outcome) => (
-                    <li key={outcome.label}>
-                      {outcome.value && <strong>{outcome.value}</strong>} {outcome.label}
-                      {outcome.kind !== 'result' && <em> ({outcome.kind})</em>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
+            </div>
           </div>
         </article>
       )}

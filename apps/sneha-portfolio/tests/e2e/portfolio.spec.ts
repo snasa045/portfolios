@@ -301,14 +301,37 @@ test('archive spine fills the full dialog viewport on tall screens', async ({ pa
   expect(Math.abs(bounds.spineBottom - bounds.panelBottom)).toBeLessThanOrEqual(1);
 });
 
-test('archive evidence sheets use the portfolio card radius', async ({ page }) => {
+test('archive chapters share one continuous paper surface', async ({ page }) => {
   await page.goto(basePath);
-  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
 
-  await expect(page.locator('.supporting-evidence-sheet').first()).toHaveCSS(
-    'border-radius',
-    '14px',
-  );
+  for (const project of supportingProjects) {
+    await page.getByRole('button', { name: `${project.title} — read the full story` }).click();
+
+    const paper = page.locator('.supporting-archive-paper');
+    await expect(paper).toHaveCount(1);
+    await expect(paper.locator('.supporting-evidence-sheet')).toHaveCount(
+      project.sections.length + 2,
+    );
+    await expect(paper).toHaveCSS('border-radius', '14px');
+
+    const surfaces = await paper.locator('.supporting-evidence-sheet').evaluateAll((sheets) =>
+      sheets.map((sheet) => {
+        const style = getComputedStyle(sheet);
+        return {
+          background: style.backgroundColor,
+          radius: style.borderRadius,
+          shadow: style.boxShadow,
+        };
+      }),
+    );
+
+    expect(surfaces).toEqual(
+      surfaces.map(() => ({ background: 'rgba(0, 0, 0, 0)', radius: '0px', shadow: 'none' })),
+    );
+
+    await page.getByRole('button', { name: `Close ${project.title}` }).click();
+    await expect(page.getByRole('dialog')).toBeHidden();
+  }
 });
 
 test('archive card overlaps the rounded title tab and meets WCAG AA contrast', async ({
@@ -319,7 +342,7 @@ test('archive card overlaps the rounded title tab and meets WCAG AA contrast', a
 
   const geometry = await page.locator('.supporting-archive-desk').evaluate((desk) => {
     const tabElement = desk.querySelector('.supporting-archive-tab')!;
-    const cardElement = desk.querySelector('.supporting-evidence-sheet')!;
+    const cardElement = desk.querySelector('.supporting-archive-paper')!;
     const tab = getComputedStyle(tabElement);
     const extension = getComputedStyle(tabElement, '::after');
     const card = getComputedStyle(cardElement);
