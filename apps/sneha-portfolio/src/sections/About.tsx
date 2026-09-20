@@ -1,4 +1,4 @@
-import { about, capabilities, education, experience } from '../data/portfolio';
+import { about, assetUrl, capabilities, education, experience } from '../data/portfolio';
 import Reveal from '../components/Reveal';
 
 export default function About() {
@@ -10,9 +10,31 @@ export default function About() {
 
       <Reveal className="about-grid" delay={80}>
         <div className="about-story">
+          <img
+            className="about-portrait"
+            src={assetUrl('images/sneha-portrait-400.webp')}
+            alt="Sneha Jadhav"
+            width={400}
+            height={400}
+            loading="lazy"
+            decoding="async"
+          />
           {about.body.map((p) => (
             <p key={p.slice(0, 32)}>{p}</p>
           ))}
+
+          <div className="capabilities">
+            {capabilities.map((c) => (
+              <div key={c.title}>
+                <h3>{c.title}</h3>
+                <ul className="plain">
+                  {c.items.map((i) => (
+                    <li key={i}>{i}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="about-side">
@@ -37,19 +59,6 @@ export default function About() {
             ))}
           </ul>
         </div>
-      </Reveal>
-
-      <Reveal className="capabilities" delay={120}>
-        {capabilities.map((c) => (
-          <div key={c.title}>
-            <h3>{c.title}</h3>
-            <ul className="plain">
-              {c.items.map((i) => (
-                <li key={i}>{i}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
       </Reveal>
     </section>
   );

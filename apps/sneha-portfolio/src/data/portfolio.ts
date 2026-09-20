@@ -27,7 +27,7 @@ export const currentWork = {
   heading: 'What I’m working on now',
   org: 'CSA Group',
   role: 'Senior Product Designer',
-  period: 'Sept 2021 – present',
+  period: 'Oct 2025 – present · at CSA since Sept 2021',
   context:
     'CSA Group develops standards in 57 areas, from electrical and industrial equipment to construction materials. Around 40% of them are referenced in Canadian legislation — so the people using our software are professionals who have to find, read, and correctly apply rules that carry real legal weight.',
   body: [
@@ -47,53 +47,64 @@ export const about = {
   ],
 };
 
+/**
+ * Mirrors Sneha-Jadhav-Resume.pdf verbatim. `compact` marks the roles the résumé
+ * itself lists without detail, so both documents keep the same emphasis.
+ */
 export const experience = [
   {
     role: 'Senior Product Designer',
     org: 'CSA Group',
     period: 'Oct 2025 – Present',
-    place: 'Toronto',
+    place: 'Toronto, ON',
+    compact: false,
     points: [
-      'Leading development of the CSA Design System — framework and standards for cohesive design across the organisation',
-      'UX Lead on a comprehensive brand identity transformation, including logo and identity updates',
+      'Lead development of the CSA Design System, setting the framework and standards that keep design coherent across the organisation',
+      'Served as UX Lead on a comprehensive brand identity transformation, extending into logo and identity updates',
+      'Embed WCAG 2.0/2.1 and AODA conformance into shared components, so accessibility is inherited rather than retrofitted',
     ],
   },
   {
     role: 'Product Designer',
     org: 'CSA Group',
     period: 'Sept 2021 – Oct 2025',
-    place: 'Toronto',
+    place: 'Toronto, ON',
+    compact: false,
     points: [
-      'CSA Advantage across mobile and desktop, as part of the Standards Digital Transformation',
-      'UX research end to end: user interviews, journeys, focus groups, market analysis, testing',
-      'WCAG 2.0/2.1 accessibility built into interface patterns rather than retrofitted',
+      'Designed CSA Advantage across mobile and desktop, simplifying how professionals locate and apply technical standards',
+      'Led critical projects within the Standards Digital Transformation, turning dense business requirements into flows users could follow',
+      'Ran research end to end — interviews, journey mapping, focus groups, usability testing — owning the lifecycle from concept to tested prototype',
     ],
   },
   {
     role: 'Product Designer',
     org: 'Travel Discounters',
     period: 'Jan – Aug 2021',
-    place: 'Toronto',
+    place: 'Toronto, ON',
+    compact: false,
     points: [
-      'User research that boosted the business by 80%, and product service changes that lifted profit margin by roughly 50%',
-      'Built an internal quoting portal for sales agents; accessibility work for a largely senior audience',
+      'Improved the customer-facing site through user research, reported to have boosted the business by 80% and lifted profit margin by roughly 50%',
+      "Built an internal quoting portal, established the company's first design system, and raised accessibility for a largely senior-citizen audience",
     ],
   },
   {
     role: 'UI/UX Designer',
     org: 'Rafiki Digital',
     period: 'Oct – Dec 2020',
-    place: 'Toronto',
-    points: ['Defined UX strategy, methodology, and delivery milestones with the product owner'],
+    place: 'Toronto, ON',
+    compact: true,
+    points: [
+      'Defined UX strategy, methodology, and delivery milestones with the product owner; led the persona and journey work that reframed a B2B consultancy site around a visitor in crisis',
+    ],
   },
   {
     role: 'UI/UX Designer',
     org: "Recruit 'N' Refer",
     period: 'Apr – Oct 2020',
-    place: 'Toronto',
+    place: 'Toronto, ON',
+    compact: true,
     points: [
-      'Wireframes and prototypes for a responsive portal; usability testing on new pages',
-      'Shipped phase one with developers',
+      'Delivered wireframes, prototypes, and usability testing for a responsive hiring portal, shipping phase one with developers',
     ],
   },
   {
@@ -101,16 +112,19 @@ export const experience = [
     org: 'Upwork',
     period: 'Feb – Oct 2020',
     place: 'Remote',
-    points: ['10+ projects for 5+ clients across web, mobile, and redesign work'],
+    compact: true,
+    points: [
+      'Delivered 10+ web, mobile, and redesign projects for 5+ clients using Figma, Sketch, and InVision',
+    ],
   },
   {
     role: 'Junior UI/UX Designer',
     org: 'SevenMentor Pvt Ltd',
     period: 'Feb 2018 – Jan 2020',
-    place: 'Pune, Maharashtra',
+    place: 'Pune, India',
+    compact: true,
     points: [
-      'Website redesign: +11% user satisfaction and −33% mobile bounce rate',
-      'Admissions lift reported at roughly Rs. 500K per year',
+      'Redesigned the SevenMentor website: +11% user satisfaction, −33% mobile bounce rate, and an admissions lift generating approximately Rs. 500K annually',
     ],
   },
 ];
@@ -154,9 +168,10 @@ export const capabilities = [
   },
 ];
 
+/** Matches the résumé exactly; LinkedIn's Udemy certificates and SevenMentor training stay off. */
 export const education = [
-  'BrainStation — Diploma, User Experience Design · Toronto · 2020',
-  'SevenMentor — UI/UX Training · Pune · 2017–2018',
+  'Diploma, User Experience Design — BrainStation · Toronto · 2020',
+  'B.E. Computer Engineering — University of Pune · 2010–2014',
 ];
 
 export const navLinks = [

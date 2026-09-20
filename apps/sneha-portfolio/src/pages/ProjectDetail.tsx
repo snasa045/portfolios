@@ -1,8 +1,13 @@
 import { Link, useParams } from 'react-router-dom';
-import ProjectMedia from '../components/ProjectMedia';
+import CaseChapterNav from '../components/CaseChapterNav';
+import CaseClosing from '../components/CaseClosing';
+import CaseDecision from '../components/CaseDecision';
+import CaseHero from '../components/CaseHero';
+import NextCaseStudy from '../components/NextCaseStudy';
 import Reveal from '../components/Reveal';
+import SectionBody from '../components/SectionBody';
 import { featuredProjects, projectBySlug } from '../data/projects';
-import { statusLabel, type CaseSection } from '../types/portfolio';
+import { isMediaSection, type CaseSection } from '../types/portfolio';
 import NotFound from './NotFound';
 
 export default function ProjectDetail() {
@@ -11,115 +16,81 @@ export default function ProjectDetail() {
 
   if (!project) return <NotFound />;
 
-  const index = featuredProjects.findIndex((p) => p.slug === project.slug);
+  const index = featuredProjects.findIndex((item) => item.slug === project.slug);
   const next = featuredProjects[(index + 1) % featuredProjects.length];
+  const { decisionIndex, reflectionIndex, theme } = project.presentation;
+  const decision = project.sections[decisionIndex];
+  const reflection = project.sections[reflectionIndex];
+
+  if (decision.kind !== 'text' || reflection.kind !== 'text') return <NotFound />;
+
+  const chapters = project.sections.map((section, sectionIndex) => ({
+    id: `chapter-${sectionIndex + 1}`,
+    label: section.heading ?? 'Product experience',
+  }));
 
   return (
-    <article className="case">
-      <Reveal as="header" className="case-head" direction="left">
-        <p className="case-meta">
-          <span className={`status status-${project.status}`}>{statusLabel[project.status]}</span>
-          <span>{project.timeframe}</span>
-        </p>
-        <h1>{project.title}</h1>
-        <p className="case-summary">{project.summary}</p>
-        <dl className="case-facts">
-          <div>
-            <dt>Role</dt>
-            <dd>{project.role}</dd>
-          </div>
-          {project.team && (
-            <div>
-              <dt>Team</dt>
-              <dd>{project.team}</dd>
-            </div>
-          )}
-          <div>
-            <dt>Timeframe</dt>
-            <dd>{project.timeframe}</dd>
-          </div>
-        </dl>
-      </Reveal>
+    <article className="case case-world" data-case-theme={theme}>
+      <CaseHero project={project} />
+      <CaseChapterNav chapters={chapters} />
 
-      {project.cover && (
-        <Reveal className="case-cover-reveal" delay={80}>
-          <ProjectMedia figure={project.cover} eager className="case-cover" />
-        </Reveal>
-      )}
+      <div className="case-story">
+        {project.sections.map((section, sectionIndex) => {
+          if (sectionIndex === reflectionIndex) return null;
+          if (sectionIndex === decisionIndex) {
+            return (
+              <CaseDecision
+                key={sectionIndex}
+                id={`chapter-${sectionIndex + 1}`}
+                index={sectionIndex}
+                heading={decision.heading}
+                body={decision.body}
+              />
+            );
+          }
 
-      <div className="case-body">
-        {project.sections.map((section, i) => (
-          <Section key={i} section={section} />
-        ))}
+          return (
+            <CaseChapter
+              key={sectionIndex}
+              id={`chapter-${sectionIndex + 1}`}
+              index={sectionIndex}
+              section={section}
+            />
+          );
+        })}
 
-        {project.outcomes.length > 0 && (
-          <Reveal as="section" className="case-outcomes">
-            <h2>Outcome</h2>
-            <ul>
-              {project.outcomes.map((o) => (
-                <li key={o.label}>
-                  {o.value && <strong>{o.value}</strong>} {o.label}
-                  {o.kind !== 'result' && <em className="outcome-kind"> ({o.kind})</em>}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        )}
+        <CaseClosing
+          id={`chapter-${reflectionIndex + 1}`}
+          reflection={reflection.body}
+          outcomes={project.outcomes}
+        />
       </div>
 
-      <Reveal as="nav" className="case-nav">
+      <nav className="case-return" aria-label="Portfolio navigation">
         <Link to="/" state={{ scrollTo: '#work' }}>
           ← Back to work
         </Link>
-        <Link to={`/project/${next.slug}`}>Next: {next.title} →</Link>
-      </Reveal>
+      </nav>
+      <NextCaseStudy project={next} />
     </article>
   );
 }
 
-function Section({ section }: { section: CaseSection }) {
-  if (section.kind === 'text') {
-    return (
-      <Reveal as="section">
-        <h2>{section.heading}</h2>
-        {section.body.map((p) => (
-          <p key={p.slice(0, 32)}>{p}</p>
-        ))}
-      </Reveal>
-    );
-  }
-
-  if (section.kind === 'figure') {
-    return (
-      <Reveal as="section">
-        {section.heading && <h2>{section.heading}</h2>}
-        <ProjectMedia figure={section.figure} />
-      </Reveal>
-    );
-  }
-
-  if (section.kind === 'comparison') {
-    return (
-      <Reveal as="section">
-        <h2>{section.heading}</h2>
-        <div className="comparison">
-          <ProjectMedia figure={section.before} />
-          <ProjectMedia figure={section.after} />
-        </div>
-      </Reveal>
-    );
-  }
+function CaseChapter({ id, index, section }: { id: string; index: number; section: CaseSection }) {
+  const media = isMediaSection(section);
 
   return (
-    <Reveal as="section" className="case-outcomes">
-      <h2>{section.heading}</h2>
-      <ul>
-        {section.items.map((o) => (
-          <li key={o.label}>
-            {o.value && <strong>{o.value}</strong>} {o.label}
-          </li>
-        ))}
-      </ul>
+    <Reveal
+      as="section"
+      id={id}
+      className={media ? 'case-chapter case-media-stage' : 'case-chapter'}
+      direction={media ? 'none' : 'up'}
+    >
+      <header>
+        <span>{String(index + 1).padStart(2, '0')}</span>
+        <h2>{section.heading ?? 'Product experience'}</h2>
+      </header>
+      <SectionBody section={section} />
     </Reveal>
   );
 }

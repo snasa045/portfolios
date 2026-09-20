@@ -17,12 +17,22 @@ export type CaseSection =
   | { kind: 'comparison'; heading: string; before: Figure; after: Figure }
   | { kind: 'outcomes'; heading: string; items: Outcome[] };
 
+export const isMediaSection = (section: CaseSection) =>
+  section.kind === 'figure' || section.kind === 'comparison';
+
 /** `kind` separates what was measured from what was only intended. */
 export type Outcome = {
   label: string;
   value?: string;
   kind: 'result' | 'estimate' | 'hypothesis' | 'qualitative';
   source?: string;
+};
+
+export type CasePresentation = {
+  theme: 'calm' | 'graphic' | 'editorial';
+  statement: string;
+  decisionIndex: number;
+  reflectionIndex: number;
 };
 
 export type Project = {
@@ -38,13 +48,20 @@ export type Project = {
   sections: CaseSection[];
   outcomes: Outcome[];
   seoDescription: string;
+  presentation: CasePresentation;
 };
 
 export type SupportingProject = {
+  id: string;
   title: string;
   blurb: string;
   timeframe: string;
   status: DeliveryStatus;
+  role: string;
+  context: string;
+  cover: Figure;
+  sections: CaseSection[];
+  outcomes: Outcome[];
 };
 
 export const statusLabel: Record<DeliveryStatus, string> = {

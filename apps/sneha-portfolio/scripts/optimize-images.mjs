@@ -13,7 +13,7 @@ const appRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const srcDir = join(appRoot, 'assets/images-src');
 const outDir = join(appRoot, 'public/images');
 
-export const WIDTHS = [640, 960, 1600];
+export const WIDTHS = [400, 640, 960, 1600];
 const QUALITY = 80;
 
 const pixelWidth = async (file) => {
