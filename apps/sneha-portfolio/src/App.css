@@ -865,7 +865,16 @@ h3 { font-size: var(--step-h3); }
   .supporting-archive-tab { min-width: 62%; }
   .supporting-evidence-sheet { grid-template-columns: 1fr; gap: 0.8rem; padding: 1.35rem; }
   .supporting-evidence-content h3 { font-size: clamp(1.35rem, 7vw, 1.8rem); }
-  .supporting-dialog-close { top: 1.2rem; right: 1.2rem; }
+  .supporting-dialog-close {
+    position: fixed;
+    z-index: 40;
+    top: max(1.25rem, env(safe-area-inset-top));
+    right: max(1.25rem, env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
+    background: var(--ink);
+    box-shadow: 0 6px 18px rgba(31, 22, 17, 0.28);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

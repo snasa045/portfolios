@@ -285,6 +285,42 @@ test('archive close control has a visible WCAG focus indicator', async ({ page }
   expect(contrastRatio(colors.indicator, colors.adjacent)).toBeGreaterThanOrEqual(3);
 });
 
+test('mobile archive close control stays reachable after scrolling to the end', async ({ page }) => {
+  for (const viewport of [
+    { width: 320, height: 568 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto(basePath);
+    await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).not.toHaveClass(/is-animating/);
+    await dialog.hover();
+    await page.mouse.wheel(0, 100_000);
+    await expect.poll(() => dialog.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+
+    const bounds = await page.getByRole('button', { name: 'Close Figo Friend' }).evaluate((close) => {
+      const rect = close.getBoundingClientRect();
+      return {
+        top: rect.top,
+        right: rect.right,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+      };
+    });
+
+    expect(bounds.top).toBeGreaterThanOrEqual(0);
+    expect(bounds.right).toBeLessThanOrEqual(viewport.width);
+    expect(bounds.bottom).toBeLessThanOrEqual(viewport.height);
+    expect(bounds.width).toBeGreaterThanOrEqual(44);
+    expect(bounds.height).toBeGreaterThanOrEqual(44);
+
+    await page.getByRole('button', { name: 'Close Figo Friend' }).click();
+    await expect(page.getByRole('dialog')).toBeHidden();
+  }
+});
+
 test('archive spine fills the full dialog viewport on tall screens', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 950 });
   await page.goto(basePath);
