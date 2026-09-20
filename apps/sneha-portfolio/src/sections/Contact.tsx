@@ -1,8 +1,9 @@
 import { assetUrl, profile } from '../data/portfolio';
+import Reveal from '../components/Reveal';
 
 export default function Contact() {
   return (
-    <section className="section section-contact" id="contact">
+    <Reveal as="section" className="section section-contact" id="contact">
       <h2>Let’s talk</h2>
       <p>
         I’m always glad to talk about product design, design systems, or accessibility work.
@@ -19,6 +20,6 @@ export default function Contact() {
         </a>
       </div>
       <p className="contact-meta">{profile.location}</p>
-    </section>
+    </Reveal>
   );
 }

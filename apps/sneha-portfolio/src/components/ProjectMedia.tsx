@@ -23,8 +23,16 @@ export default function ProjectMedia({ figure, eager = false, layout = 'full', c
   const widths = available.length ? available : [WIDTHS[0]];
   const url = (w: number) => assetUrl(`images/${figure.name}-${w}.webp`);
 
+  const classes = [
+    'media',
+    figure.height && figure.width && figure.height > figure.width * 1.5 && 'media-tall',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <figure className={className ? `media ${className}` : 'media'}>
+    <figure className={classes}>
       <img
         src={url(widths[widths.length - 1])}
         srcSet={widths.map((w) => `${url(w)} ${w}w`).join(', ')}

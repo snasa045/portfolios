@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import ProjectMedia from '../components/ProjectMedia';
+import Reveal from '../components/Reveal';
 import { featuredProjects, projectBySlug } from '../data/projects';
 import { statusLabel, type CaseSection } from '../types/portfolio';
 import NotFound from './NotFound';
@@ -15,7 +16,7 @@ export default function ProjectDetail() {
 
   return (
     <article className="case">
-      <header className="case-head">
+      <Reveal as="header" className="case-head" direction="left">
         <p className="case-meta">
           <span className={`status status-${project.status}`}>{statusLabel[project.status]}</span>
           <span>{project.timeframe}</span>
@@ -38,9 +39,13 @@ export default function ProjectDetail() {
             <dd>{project.timeframe}</dd>
           </div>
         </dl>
-      </header>
+      </Reveal>
 
-      {project.cover && <ProjectMedia figure={project.cover} eager className="case-cover" />}
+      {project.cover && (
+        <Reveal className="case-cover-reveal" delay={80}>
+          <ProjectMedia figure={project.cover} eager className="case-cover" />
+        </Reveal>
+      )}
 
       <div className="case-body">
         {project.sections.map((section, i) => (
@@ -48,7 +53,7 @@ export default function ProjectDetail() {
         ))}
 
         {project.outcomes.length > 0 && (
-          <section className="case-outcomes">
+          <Reveal as="section" className="case-outcomes">
             <h2>Outcome</h2>
             <ul>
               {project.outcomes.map((o) => (
@@ -58,14 +63,16 @@ export default function ProjectDetail() {
                 </li>
               ))}
             </ul>
-          </section>
+          </Reveal>
         )}
       </div>
 
-      <nav className="case-nav">
-        <Link to="/">← Back to work</Link>
+      <Reveal as="nav" className="case-nav">
+        <Link to="/" state={{ scrollTo: '#work' }}>
+          ← Back to work
+        </Link>
         <Link to={`/project/${next.slug}`}>Next: {next.title} →</Link>
-      </nav>
+      </Reveal>
     </article>
   );
 }
@@ -73,38 +80,38 @@ export default function ProjectDetail() {
 function Section({ section }: { section: CaseSection }) {
   if (section.kind === 'text') {
     return (
-      <section>
+      <Reveal as="section">
         <h2>{section.heading}</h2>
         {section.body.map((p) => (
           <p key={p.slice(0, 32)}>{p}</p>
         ))}
-      </section>
+      </Reveal>
     );
   }
 
   if (section.kind === 'figure') {
     return (
-      <section>
+      <Reveal as="section">
         {section.heading && <h2>{section.heading}</h2>}
         <ProjectMedia figure={section.figure} />
-      </section>
+      </Reveal>
     );
   }
 
   if (section.kind === 'comparison') {
     return (
-      <section>
+      <Reveal as="section">
         <h2>{section.heading}</h2>
         <div className="comparison">
           <ProjectMedia figure={section.before} />
           <ProjectMedia figure={section.after} />
         </div>
-      </section>
+      </Reveal>
     );
   }
 
   return (
-    <section className="case-outcomes">
+    <Reveal as="section" className="case-outcomes">
       <h2>{section.heading}</h2>
       <ul>
         {section.items.map((o) => (
@@ -113,6 +120,6 @@ function Section({ section }: { section: CaseSection }) {
           </li>
         ))}
       </ul>
-    </section>
+    </Reveal>
   );
 }

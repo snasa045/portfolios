@@ -10,6 +10,7 @@
     "build:ssr": "vite build --ssr src/entry-server.tsx --outDir dist-ssr",
     "prerender": "node scripts/prerender.mjs",
     "serve:dist": "node scripts/serve-static.mjs",
+    "test:e2e": "playwright test",
     "lint": "oxlint",
     "preview": "vite preview"
   },
@@ -19,6 +20,7 @@
     "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",

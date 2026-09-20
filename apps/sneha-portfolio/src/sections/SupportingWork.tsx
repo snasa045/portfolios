@@ -1,14 +1,15 @@
 import { supportingProjects } from '../data/projects';
 import { statusLabel } from '../types/portfolio';
+import Reveal from '../components/Reveal';
 
 export default function SupportingWork() {
   return (
     <section className="section" id="earlier">
-      <header className="section-head">
+      <Reveal as="header" className="section-head">
         <h2>Earlier work and explorations</h2>
         <p>Sprints, concepts, and coursework from 2020.</p>
-      </header>
-      <ul className="supporting">
+      </Reveal>
+      <Reveal as="ul" className="supporting" delay={90}>
         {supportingProjects.map((p) => (
           <li key={p.title}>
             <h3>{p.title}</h3>
@@ -19,7 +20,7 @@ export default function SupportingWork() {
             </p>
           </li>
         ))}
-      </ul>
+      </Reveal>
     </section>
   );
 }

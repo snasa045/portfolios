@@ -1,13 +1,14 @@
 import { about, capabilities, education, experience } from '../data/portfolio';
+import Reveal from '../components/Reveal';
 
 export default function About() {
   return (
     <section className="section" id="about">
-      <header className="section-head">
+      <Reveal as="header" className="section-head">
         <h2>{about.heading}</h2>
-      </header>
+      </Reveal>
 
-      <div className="about-grid">
+      <Reveal className="about-grid" delay={80}>
         <div className="about-story">
           {about.body.map((p) => (
             <p key={p.slice(0, 32)}>{p}</p>
@@ -36,9 +37,9 @@ export default function About() {
             ))}
           </ul>
         </div>
-      </div>
+      </Reveal>
 
-      <div className="capabilities">
+      <Reveal className="capabilities" delay={120}>
         {capabilities.map((c) => (
           <div key={c.title}>
             <h3>{c.title}</h3>
@@ -49,7 +50,7 @@ export default function About() {
             </ul>
           </div>
         ))}
-      </div>
+      </Reveal>
     </section>
   );
 }

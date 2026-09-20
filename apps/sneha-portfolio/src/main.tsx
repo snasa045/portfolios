@@ -5,6 +5,12 @@ import './index.css';
 import App from './App.tsx';
 
 const root = document.getElementById('root')!;
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+document.documentElement.dataset.motionStyle = 'expressive';
+if ('IntersectionObserver' in window && !reducedMotion) {
+  document.documentElement.classList.add('motion-ready');
+}
 
 const tree = (
   <StrictMode>

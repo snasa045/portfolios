@@ -23,7 +23,10 @@ export default function Navbar() {
   const goToSection = (hash: string) => {
     setOpen(false);
     if (pathname === '/') {
-      document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
+      requestAnimationFrame(() => {
+        const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+        document.querySelector(hash)?.scrollIntoView({ behavior, block: 'start' });
+      });
     } else {
       navigate('/', { state: { scrollTo: hash } });
     }
