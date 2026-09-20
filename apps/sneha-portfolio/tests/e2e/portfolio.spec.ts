@@ -424,6 +424,111 @@ test('Adidas decision and closing surfaces meet WCAG AA contrast', async ({ page
   }
 });
 
+test('featured case-study text meets WCAG AA contrast', async ({ browser }) => {
+  const context = await browser.newContext({
+    reducedMotion: 'reduce',
+    viewport: { width: 1440, height: 900 },
+  });
+  const page = await context.newPage();
+  const selectors = [
+    '.case-hero-kicker span',
+    '.case-facts dt',
+    '.case-chapter-nav a',
+    '.case-chapter-nav a span',
+    '.case-chapter header > span',
+    '.case-decision-number',
+    '.case-section-label',
+    '.case-closing em',
+  ].join(', ');
+
+  for (const project of projects) {
+    await page.goto(`http://127.0.0.1:4179${basePath}project/${project.slug}`);
+    const samples = await page.locator(selectors).evaluateAll((elements) => {
+      const channels = (value: string) =>
+        value.match(/[\d.]+/g)!.slice(0, 4).map(Number) as [number, number, number, number?];
+      const backgroundFor = (element: Element) => {
+        let current: Element | null = element;
+        while (current) {
+          const background = getComputedStyle(current).backgroundColor;
+          const values = channels(background);
+          if ((values[3] ?? 1) > 0) return values;
+          current = current.parentElement;
+        }
+        return [255, 255, 255, 1] as [number, number, number, number];
+      };
+
+      return elements.map((element) => {
+        const style = getComputedStyle(element);
+        const foreground = channels(style.color);
+        const background = backgroundFor(element);
+        const opacity = Number(style.opacity) * (foreground[3] ?? 1);
+        const effectiveForeground = foreground
+          .slice(0, 3)
+          .map((channel, index) => channel * opacity + background[index] * (1 - opacity));
+        const fontSize = Number.parseFloat(style.fontSize);
+        const fontWeight = Number.parseInt(style.fontWeight, 10) || 400;
+        const largeText = fontSize >= 24 || (fontSize >= 18.66 && fontWeight >= 700);
+
+        return {
+          label: `${element.className || element.tagName} “${element.textContent?.trim()}”`,
+          background: `rgb(${background.slice(0, 3).join(', ')})`,
+          foreground: `rgb(${effectiveForeground.join(', ')})`,
+          required: largeText ? 3 : 4.5,
+        };
+      });
+    });
+
+    for (const sample of samples) {
+      expect.soft(
+        contrastRatio(sample.background, sample.foreground),
+        `${project.slug}: ${sample.label}`,
+      ).toBeGreaterThanOrEqual(sample.required);
+    }
+  }
+
+  await context.close();
+});
+
+test('case-study chapter focus indicators meet WCAG non-text contrast', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  for (const project of projects) {
+    await page.goto(`${basePath}project/${project.slug}`);
+    const firstChapter = page.locator('.case-chapter-nav a').first();
+
+    for (let index = 0; index < 10; index += 1) {
+      if (await firstChapter.evaluate((link) => link === document.activeElement)) break;
+      await page.keyboard.press('Tab');
+    }
+    await expect(firstChapter).toBeFocused();
+
+    const colors = await firstChapter.evaluate((link) => ({
+      indicator: getComputedStyle(link).outlineColor,
+      adjacent: getComputedStyle(link.closest('.case-chapter-nav')!).backgroundColor,
+    }));
+    expect(
+      contrastRatio(colors.indicator, colors.adjacent),
+      `${project.slug}: chapter focus outline`,
+    ).toBeGreaterThanOrEqual(3);
+  }
+});
+
+test('desktop hero motion finishes within five seconds', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(basePath);
+
+  const motion = await page.locator('.hero-artwork-card').first().evaluate((card) => {
+    const style = getComputedStyle(card);
+    return {
+      duration: Number.parseFloat(style.animationDuration) * 1000,
+      iterations: style.animationIterationCount,
+    };
+  });
+
+  expect(motion.duration).toBeLessThanOrEqual(5000);
+  expect(motion.iterations).toBe('1');
+});
+
 test('reduced motion keeps content visible and disables motion transforms', async ({ browser }) => {
   const context = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
@@ -444,7 +549,7 @@ test('reduced motion keeps content visible and disables motion transforms', asyn
   await context.close();
 });
 
-for (const width of [360, 390, 768, 1440]) {
+for (const width of [320, 360, 390, 768, 1440]) {
   for (const route of ['', ...projects.map((project) => `project/${project.slug}`), 'missing-page']) {
     test(`no horizontal overflow at ${width}px on /${route || 'home'}`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });

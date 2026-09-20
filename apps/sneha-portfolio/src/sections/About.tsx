@@ -1,4 +1,5 @@
 import { about, assetUrl, capabilities, education, experience } from '../data/portfolio';
+import PortraitTilt from '../components/PortraitTilt';
 import Reveal from '../components/Reveal';
 
 export default function About() {
@@ -10,15 +11,7 @@ export default function About() {
 
       <Reveal className="about-grid" delay={80}>
         <div className="about-story">
-          <img
-            className="about-portrait"
-            src={assetUrl('images/sneha-portrait-400.webp')}
-            alt="Sneha Jadhav"
-            width={400}
-            height={400}
-            loading="lazy"
-            decoding="async"
-          />
+          <PortraitTilt src={assetUrl('images/sneha-portrait-400.webp')} alt="Sneha Jadhav" />
           {about.body.map((p) => (
             <p key={p.slice(0, 32)}>{p}</p>
           ))}

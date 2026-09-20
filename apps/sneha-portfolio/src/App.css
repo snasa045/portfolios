@@ -883,13 +883,56 @@ h3 { font-size: var(--step-h3); }
   float: left;
   width: clamp(150px, 14vw, 194px);
   aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 50%;
   margin: 0.3rem 1.5rem 1rem 0;
   /* Wrap the copy to the circle itself; the square bounding box is the dead corner space. */
   shape-outside: circle(50%) border-box;
   shape-margin: 1rem;
+  /* The float keeps the shape; the child does the rotating, so perspective belongs here. */
+  perspective: 760px;
+}
+.about-portrait-tilt {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   box-shadow: 0 0 0 6px var(--surface), 0 0 0 7px var(--line), var(--shadow-soft);
+}
+.about-portrait-tilt img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+.about-portrait-sheen { display: none; }
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .about-portrait-tilt {
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(var(--tz, 0px))
+      scale(var(--sc, 1));
+    transition: transform var(--ease-expressive), box-shadow var(--ease-expressive);
+  }
+  /* While tracking, the portrait has to feel pinned to the cursor — the slow curve is for settling. */
+  .about-portrait.is-live .about-portrait-tilt {
+    transition: transform 80ms linear, box-shadow var(--ease-expressive);
+  }
+  .about-portrait:hover .about-portrait-tilt {
+    box-shadow: 0 0 0 6px var(--surface), 0 0 0 7px var(--line), var(--shadow-lift);
+  }
+  .about-portrait-sheen {
+    display: block;
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.38),
+      rgba(255, 255, 255, 0) 62%
+    );
+    transition: opacity 360ms ease;
+  }
+  .about-portrait:hover .about-portrait-sheen { opacity: 1; }
 }
 
 .about-side {
@@ -1038,6 +1081,8 @@ h3 { font-size: var(--step-h3); }
   gap: 0.6rem;
 }
 .contact-icon { width: 1.05em; height: 1.05em; flex: none; }
+/* Not a presentation attribute — var() only resolves in CSS, and silently blanks the fill there. */
+.contact-icon-resume { fill: var(--terracotta); }
 .contact-arrow { transition: transform var(--ease); }
 .contact-actions .btn:hover .contact-arrow,
 .contact-actions .btn:focus-visible .contact-arrow { transform: translateX(3px); }
@@ -1050,8 +1095,13 @@ h3 { font-size: var(--step-h3); }
 .case-world {
   --case-bg: #dcefe9;
   --case-ink: #203b3e;
-  --case-accent: #b96048;
+  --case-accent: #a83e26;
   --case-accent-ink: #fff;
+  --case-accent-text: #a83e26;
+  --case-accent-on-decision: #e9a38e;
+  --case-accent-on-closing: #a83e26;
+  --case-muted-text: #405b5e;
+  --case-nav-focus: #fffef9;
   --case-soft: #edf5f1;
   --case-paper: #fbf8f2;
   --case-decision-bg: #203b3e;
@@ -1065,6 +1115,11 @@ h3 { font-size: var(--step-h3); }
   --case-ink: #f7f4ec;
   --case-accent: #d8ff43;
   --case-accent-ink: #11110f;
+  --case-accent-text: #4d5a18;
+  --case-accent-on-decision: #d8ff43;
+  --case-accent-on-closing: #d8ff43;
+  --case-muted-text: #bdbab3;
+  --case-nav-focus: #11110f;
   --case-soft: #e8e5dc;
   --case-paper: #fffef9;
   --case-decision-bg: #11110f;
@@ -1077,6 +1132,11 @@ h3 { font-size: var(--step-h3); }
   --case-ink: #182b49;
   --case-accent: #91634f;
   --case-accent-ink: #fff;
+  --case-accent-text: #704535;
+  --case-accent-on-decision: #e5c7bb;
+  --case-accent-on-closing: #704535;
+  --case-muted-text: #4d5f79;
+  --case-nav-focus: #fffef9;
   --case-soft: #edf1f7;
   --case-paper: #fbf9f5;
   --case-decision-bg: #182b49;
@@ -1107,7 +1167,7 @@ h3 { font-size: var(--step-h3); }
   text-transform: uppercase;
 }
 .case-hero-kicker { margin-bottom: auto; }
-.case-hero-kicker span { margin-left: 0.6rem; opacity: 0.7; }
+.case-hero-kicker span { margin-left: 0.6rem; color: var(--case-muted-text); }
 .case-hero h1 { margin-block: clamp(3rem, 8vw, 7rem) 1.5rem; }
 .case-hero-project {
   display: block;
@@ -1142,10 +1202,10 @@ h3 { font-size: var(--step-h3); }
 }
 .case-facts dt {
   margin-bottom: 0.3rem;
+  color: var(--case-muted-text);
   font-size: 0.68rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  opacity: 0.65;
 }
 .case-facts dd { margin: 0; font-size: 0.82rem; line-height: 1.45; }
 .case-hero-art {
@@ -1213,7 +1273,11 @@ h3 { font-size: var(--step-h3); }
   background: var(--case-accent);
   color: var(--case-accent-ink);
 }
-.case-chapter-nav a span { opacity: 0.58; }
+.case-chapter-nav a:focus-visible {
+  outline-color: var(--case-nav-focus);
+  outline-offset: -4px;
+}
+.case-chapter-nav a span { color: inherit; }
 
 .case-story { background: var(--case-paper); }
 .case-chapter {
@@ -1226,7 +1290,7 @@ h3 { font-size: var(--step-h3); }
 }
 .case-chapter header { display: flex; min-width: 0; align-items: flex-start; gap: 1rem; }
 .case-chapter header > span {
-  color: var(--case-accent);
+  color: var(--case-accent-text);
   font-family: Fraunces, Georgia, serif;
   font-size: clamp(1.4rem, 2.5vw, 2.2rem);
   line-height: 1;
@@ -1266,14 +1330,16 @@ h3 { font-size: var(--step-h3); }
   scroll-margin-top: 9rem;
 }
 .case-decision-number {
-  color: var(--case-accent);
+  color: var(--case-accent-on-decision);
   font-family: Fraunces, Georgia, serif;
   font-size: clamp(5rem, 13vw, 11rem);
   line-height: 0.75;
 }
 .case-decision h2 { max-width: 15ch; margin: 0.7rem 0 1.5rem; font-size: clamp(2.4rem, 5vw, 4.8rem); }
 .case-decision p:not(.case-section-label) { max-width: 62ch; color: color-mix(in srgb, var(--case-decision-ink) 82%, transparent); }
-.case-section-label { margin: 0; color: var(--case-accent); }
+.case-section-label { margin: 0; color: var(--case-accent-text); }
+.case-decision .case-section-label { color: var(--case-accent-on-decision); }
+.case-closing .case-section-label { color: var(--case-accent-on-closing); }
 
 .case-closing {
   display: grid;
@@ -1287,7 +1353,7 @@ h3 { font-size: var(--step-h3); }
 .case-closing h2 { margin: 0.55rem 0 1.25rem; font-size: clamp(1.9rem, 3vw, 3rem); }
 .case-closing ul { margin: 0; padding-left: 1.15rem; }
 .case-closing li { margin-bottom: 0.75rem; }
-.case-closing em { font-size: var(--step-small); opacity: 0.68; }
+.case-closing em { color: var(--case-muted-text); font-size: var(--step-small); }
 
 .case-return {
   padding: 1.25rem 0;
@@ -1402,7 +1468,7 @@ h3 { font-size: var(--step-h3); }
 
 @media (min-width: 861px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .hero-artwork-card {
-    animation: hero-float 5.8s ease-in-out infinite;
+    animation: hero-float 4.8s ease-in-out 1 both;
     animation-delay: var(--float-delay);
   }
   .hero-artwork-panel:hover .hero-artwork-card {

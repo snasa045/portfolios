@@ -23,10 +23,12 @@ const LinkedInIcon = () => (
   </svg>
 );
 
-const PdfIcon = () => (
-  <svg className="contact-icon" viewBox="0 0 24 24" aria-hidden="true">
-    <path fill="#D93025" d="M6 2h7.2L20 8.8V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" />
-    <path fill="#fff" fillOpacity=".45" d="M13.2 2 20 8.8h-6.8V2Z" />
+/* Body fill comes from CSS so it tracks the palette token; the folded corner keeps its
+   own white. Safe in terracotta — the secondary pill keeps its light background on hover. */
+const ResumeIcon = () => (
+  <svg className="contact-icon contact-icon-resume" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6 2h7.2L20 8.8V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" />
+    <path fill="#fff" fillOpacity=".42" d="M13.2 2 20 8.8h-6.8V2Z" />
   </svg>
 );
 
@@ -55,10 +57,10 @@ const links: ContactLink[] = [
     external: true,
   },
   {
-    label: 'Résumé, one page PDF',
+    label: 'Résumé',
     href: assetUrl(profile.resume),
     arrow: '↗',
-    icon: <PdfIcon />,
+    icon: <ResumeIcon />,
     external: true,
   },
 ];
