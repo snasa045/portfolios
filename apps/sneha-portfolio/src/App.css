@@ -818,7 +818,7 @@ h3 { font-size: var(--step-h3); }
   display: grid;
   grid-template-columns: minmax(15rem, 0.32fr) minmax(0, 1fr);
   min-height: calc(100dvh - 2rem);
-  background: #f3eadf;
+  background: #fffdf8;
 }
 .supporting-archive-spine {
   position: sticky;
@@ -876,51 +876,48 @@ h3 { font-size: var(--step-h3); }
 .supporting-archive-index { margin-top: auto; padding-top: 2rem; }
 .supporting-archive-index ol { margin: 0; padding: 0; list-style: none; }
 .supporting-archive-index li {
+  border-top: 1px solid rgba(250, 247, 242, 0.16);
+}
+.supporting-archive-index button {
   display: grid;
   grid-template-columns: 1.7rem 1fr;
   gap: 0.55rem;
-  padding: 0.65rem 0;
-  border-top: 1px solid rgba(250, 247, 242, 0.16);
+  width: 100%;
+  padding: 0.65rem 0.5rem;
+  border: 0;
+  border-left: 2px solid transparent;
+  background: transparent;
   color: #d9cec5;
+  font: inherit;
   font-size: 0.76rem;
   line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--ease), border-color var(--ease), background var(--ease);
 }
-.supporting-archive-index li span { color: #e9a38e; }
+.supporting-archive-index button span { color: #e9a38e; }
+.supporting-archive-index button:hover { color: var(--ivory); }
+.supporting-archive-index button:focus-visible {
+  outline: 2px solid #e9a38e;
+  outline-offset: -2px;
+}
+.supporting-archive-index button[aria-current='step'] {
+  border-left-color: #e9a38e;
+  background: linear-gradient(90deg, rgba(233, 163, 142, 0.1), transparent 72%);
+  color: var(--ivory);
+}
 
 .supporting-archive-desk {
   min-width: 0;
-  padding: clamp(1.25rem, 3vw, 2.5rem);
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0)),
-    #e8e1d7;
-}
-.supporting-archive-tab {
-  position: relative;
-  z-index: 1;
-  width: fit-content;
-  min-width: min(18rem, 72%);
-  padding: 0.75rem 1rem calc(1rem + var(--radius));
-  border-radius: var(--radius);
-  background: #a83e26;
-  color: #fff;
-  font-size: 0.78rem;
-}
-.supporting-archive-paper {
-  position: relative;
-  z-index: 2;
-  margin-top: calc(0px - var(--radius) - var(--radius));
-  overflow: hidden;
-  border: 1px solid #d7cfc3;
-  border-radius: var(--radius);
   background: #fffdf8;
-  box-shadow: 0 12px 30px rgba(55, 43, 32, 0.1);
 }
+.supporting-archive-canvas { min-width: 0; }
 .supporting-evidence-sheet {
   position: relative;
   display: grid;
-  grid-template-columns: 3.5rem minmax(0, 1fr);
+  grid-template-columns: 2.5rem minmax(0, 1fr);
   gap: clamp(1rem, 2.5vw, 2rem);
-  padding: clamp(1.5rem, 3.5vw, 3rem);
+  padding: clamp(2.25rem, 5vw, 4.75rem) clamp(1.5rem, 4.5vw, 4rem);
   border-top: 1px solid #e4ddd2;
   border-radius: 0;
   background: transparent;
@@ -928,7 +925,7 @@ h3 { font-size: var(--step-h3); }
 }
 .supporting-archive-cover {
   display: block;
-  padding: clamp(0.75rem, 1.5vw, 1.2rem);
+  padding: clamp(1.5rem, 3vw, 2.75rem) clamp(1.5rem, 4.5vw, 4rem);
   border-top: 0;
   border-bottom: 1px solid #e4ddd2;
 }
@@ -940,16 +937,18 @@ h3 { font-size: var(--step-h3); }
   margin-inline: auto;
   object-fit: contain;
   border: 0;
-  border-radius: 0;
+  border-radius: clamp(10px, 1.2vw, 16px);
   background: #fffdf8;
 }
 .supporting-evidence-number {
+  padding-top: 0.35rem;
   color: #a83e26;
-  font-family: Fraunces, Georgia, serif;
-  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
   line-height: 1;
 }
-.supporting-evidence-content { min-width: 0; }
+.supporting-evidence-content { min-width: 0; max-width: 44rem; }
 .supporting-evidence-content h3 {
   max-width: 24ch;
   margin-bottom: 1rem;
@@ -960,7 +959,7 @@ h3 { font-size: var(--step-h3); }
 .supporting-evidence-content .case-chapter-copy p:first-child { font-size: 1.0625rem; }
 .supporting-evidence-content .case-chapter-copy p + p { margin-top: 1rem; }
 .supporting-evidence-media { display: block; }
-.supporting-evidence-media .supporting-evidence-number { display: block; margin-bottom: 0.85rem; }
+.supporting-evidence-media .supporting-evidence-number { display: block; margin-bottom: 1.25rem; }
 .supporting-evidence-media .media img {
   width: auto;
   max-width: 100%;
@@ -968,7 +967,7 @@ h3 { font-size: var(--step-h3); }
   max-height: 74vh;
   margin-inline: auto;
   object-fit: contain;
-  border-radius: 0;
+  border-radius: clamp(10px, 1.2vw, 16px);
   background: #fffdf8;
 }
 .supporting-evidence-media figcaption { max-width: 68ch; }
@@ -1003,6 +1002,17 @@ h3 { font-size: var(--step-h3); }
 .supporting-dialog-outcomes strong { color: #a83e26; font-family: Fraunces, Georgia, serif; font-size: 1.3rem; }
 .supporting-dialog-outcomes em { color: var(--muted); font-size: 0.875rem; }
 
+@media (min-width: 761px) and (max-height: 800px) {
+  .supporting-archive-spine { padding: 1.25rem 1.5rem; }
+  .supporting-dialog-head { gap: 0.55rem; margin-top: 2.25rem; }
+  .supporting-dialog-head h2 { font-size: 2.5rem; }
+  .supporting-dialog-head .supporting-dialog-title-compact { font-size: 2rem; }
+  .supporting-dialog-context { font-size: 0.875rem; line-height: 1.45; }
+  .supporting-archive-index { padding-top: 1rem; }
+  .supporting-archive-index button { padding-block: 0.42rem; }
+  .supporting-dialog-close { top: 1.25rem; right: 1.5rem; }
+}
+
 @media (max-width: 760px) {
   .supporting-dialog {
     width: calc(100vw - 1rem);
@@ -1021,9 +1031,8 @@ h3 { font-size: var(--step-h3); }
   .supporting-dialog-head h2 { max-width: 12ch; }
   .supporting-archive-index { margin-top: 1.5rem; padding-top: 0; }
   .supporting-archive-index ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .supporting-archive-index li { padding-right: 0.65rem; }
-  .supporting-archive-desk { padding: 0.75rem; }
-  .supporting-archive-tab { min-width: 62%; }
+  .supporting-archive-index button { padding-right: 0.65rem; }
+  .supporting-archive-desk { padding: 0; }
   .supporting-evidence-sheet { grid-template-columns: 1fr; gap: 0.8rem; padding: 1.35rem; }
   .supporting-evidence-content h3 { font-size: clamp(1.35rem, 7vw, 1.8rem); }
   .supporting-dialog-close {

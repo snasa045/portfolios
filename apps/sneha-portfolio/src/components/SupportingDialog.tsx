@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ProjectMedia from './ProjectMedia';
 import SectionBody from './SectionBody';
 import { isMediaSection, statusLabel, type SupportingProject } from '../types/portfolio';
@@ -34,6 +34,7 @@ export default function SupportingDialog({ project, origin, onClose }: Props) {
   const bodyRef = useRef<HTMLElement>(null);
   const closingRef = useRef(false);
   const timerRef = useRef(0);
+  const [activeSection, setActiveSection] = useState(0);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -68,6 +69,50 @@ export default function SupportingDialog({ project, origin, onClose }: Props) {
       document.body.style.overflow = overflow;
     };
   }, [project, origin]);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog || !project) return;
+
+    const sections = Array.from(
+      dialog.querySelectorAll<HTMLElement>('[data-archive-section]'),
+    );
+    const updateActiveSection = () => {
+      const reachedEnd = dialog.scrollTop + dialog.clientHeight >= dialog.scrollHeight - 1;
+      if (reachedEnd) {
+        setActiveSection(sections.length - 1);
+        return;
+      }
+
+      const marker =
+        dialog.getBoundingClientRect().top + Math.min(220, dialog.clientHeight * 0.32);
+      const nextSection = sections.reduce(
+        (current, section, index) =>
+          section.getBoundingClientRect().top <= marker ? index : current,
+        0,
+      );
+      setActiveSection(nextSection);
+    };
+
+    setActiveSection(0);
+    updateActiveSection();
+    dialog.addEventListener('scroll', updateActiveSection, { passive: true });
+    return () => dialog.removeEventListener('scroll', updateActiveSection);
+  }, [project]);
+
+  const scrollToSection = useCallback((index: number) => {
+    const dialog = dialogRef.current;
+    const section = dialog?.querySelector<HTMLElement>(`[data-archive-section="${index}"]`);
+    if (!dialog || !section) return;
+
+    const dialogTop = dialog.getBoundingClientRect().top;
+    const sectionTop = section.getBoundingClientRect().top;
+    const isFinalSection = !section.nextElementSibling;
+    dialog.scrollTo({
+      top: isFinalSection ? dialog.scrollHeight : dialog.scrollTop + sectionTop - dialogTop,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
+  }, []);
 
   const requestClose = useCallback(() => {
     const dialog = dialogRef.current;
@@ -161,24 +206,36 @@ export default function SupportingDialog({ project, origin, onClose }: Props) {
               <ol role="list">
                 {project.sections.map((section, index) => (
                   <li key={section.heading ?? index}>
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                    {section.heading ?? 'Project artifact'}
+                    <button
+                      type="button"
+                      aria-controls={`supporting-${project.id}-section-${index}`}
+                      aria-current={activeSection === index ? 'step' : undefined}
+                      onClick={() => scrollToSection(index)}
+                    >
+                      <span>{String(index + 1).padStart(2, '0')}</span>
+                      {section.heading ?? 'Project artifact'}
+                    </button>
                   </li>
                 ))}
                 <li>
-                  <span>{String(project.sections.length + 1).padStart(2, '0')}</span>
-                  What came of it
+                  <button
+                    type="button"
+                    aria-controls={`supporting-${project.id}-section-${project.sections.length}`}
+                    aria-current={
+                      activeSection === project.sections.length ? 'step' : undefined
+                    }
+                    onClick={() => scrollToSection(project.sections.length)}
+                  >
+                    <span>{String(project.sections.length + 1).padStart(2, '0')}</span>
+                    What came of it
+                  </button>
                 </li>
               </ol>
             </section>
           </aside>
 
           <div className="supporting-archive-desk">
-            <div className="supporting-archive-tab" aria-hidden="true">
-              {project.title}
-            </div>
-
-            <div className="supporting-archive-paper">
+            <div className="supporting-archive-canvas">
               <section className="supporting-evidence-sheet supporting-archive-cover">
                 <ProjectMedia figure={project.cover} eager />
               </section>
@@ -186,6 +243,8 @@ export default function SupportingDialog({ project, origin, onClose }: Props) {
               {project.sections.map((section, index) => (
                 <section
                   key={section.heading ?? index}
+                  id={`supporting-${project.id}-section-${index}`}
+                  data-archive-section={index}
                   className={`supporting-evidence-sheet${
                     isMediaSection(section) ? ' supporting-evidence-media' : ''
                   }`}
@@ -200,7 +259,11 @@ export default function SupportingDialog({ project, origin, onClose }: Props) {
                 </section>
               ))}
 
-              <section className="supporting-evidence-sheet supporting-dialog-outcomes">
+              <section
+                id={`supporting-${project.id}-section-${project.sections.length}`}
+                className="supporting-evidence-sheet supporting-dialog-outcomes"
+                data-archive-section={project.sections.length}
+              >
                 <span className="supporting-evidence-number" aria-hidden="true">
                   {String(project.sections.length + 1).padStart(2, '0')}
                 </span>

@@ -406,22 +406,65 @@ test('archive spine fills the full dialog viewport on tall screens', async ({ pa
   expect(Math.abs(bounds.spineBottom - bounds.panelBottom)).toBeLessThanOrEqual(1);
 });
 
-test('archive chapters share one continuous paper surface', async ({ page }) => {
+test('archive index remains fully visible on a compact laptop viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto(basePath);
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+  await expect(page.getByRole('dialog')).not.toHaveClass(/is-animating/);
+
+  const bounds = await page.locator('.supporting-archive-spine').evaluate((spine) => {
+    const container = spine.getBoundingClientRect();
+    const finalItem = spine.querySelector('.supporting-archive-index li:last-child')!.getBoundingClientRect();
+    return {
+      finalItemBottom: finalItem.bottom,
+      containerBottom: container.bottom,
+      scrollHeight: spine.scrollHeight,
+      clientHeight: spine.clientHeight,
+    };
+  });
+
+  expect(bounds.finalItemBottom).toBeLessThanOrEqual(bounds.containerBottom);
+  expect(bounds.scrollHeight).toBeLessThanOrEqual(bounds.clientHeight);
+});
+
+test('archive content uses one flat editorial artboard', async ({ page }) => {
   await page.goto(basePath);
 
   for (const project of supportingProjects) {
     await page.getByRole('button', { name: `${project.title} — read the full story` }).click();
 
-    const paper = page.locator('.supporting-archive-paper');
-    await expect(paper).toHaveCount(1);
-    await expect(paper.locator('.supporting-evidence-sheet')).toHaveCount(
+    const dialog = page.getByRole('dialog');
+    const canvas = dialog.locator('.supporting-archive-canvas');
+    await expect(dialog.locator('.supporting-archive-tab')).toHaveCount(0);
+    await expect(dialog.locator('.supporting-archive-paper')).toHaveCount(0);
+    await expect(canvas).toHaveCount(1);
+    await expect(canvas.locator('.supporting-evidence-sheet')).toHaveCount(
       project.sections.length + 2,
     );
-    await expect(paper).toHaveCSS('border-radius', '14px');
 
-    const surfaces = await paper.locator('.supporting-evidence-sheet').evaluateAll((sheets) =>
-      sheets.map((sheet) => {
-        const style = getComputedStyle(sheet);
+    const surface = await canvas.evaluate((element) => {
+      const desk = element.closest('.supporting-archive-desk')!;
+      const canvasStyle = getComputedStyle(element);
+      const deskStyle = getComputedStyle(desk);
+      return {
+        canvasBackground: canvasStyle.backgroundColor,
+        canvasBorder: canvasStyle.borderStyle,
+        canvasRadius: canvasStyle.borderRadius,
+        canvasShadow: canvasStyle.boxShadow,
+        deskBackground: deskStyle.backgroundColor,
+      };
+    });
+    expect(surface).toEqual({
+      canvasBackground: 'rgba(0, 0, 0, 0)',
+      canvasBorder: 'none',
+      canvasRadius: '0px',
+      canvasShadow: 'none',
+      deskBackground: 'rgb(255, 253, 248)',
+    });
+
+    const sections = await canvas.locator('.supporting-evidence-sheet').evaluateAll((elements) =>
+      elements.map((element) => {
+        const style = getComputedStyle(element);
         return {
           background: style.backgroundColor,
           radius: style.borderRadius,
@@ -430,8 +473,8 @@ test('archive chapters share one continuous paper surface', async ({ page }) => 
       }),
     );
 
-    expect(surfaces).toEqual(
-      surfaces.map(() => ({ background: 'rgba(0, 0, 0, 0)', radius: '0px', shadow: 'none' })),
+    expect(sections).toEqual(
+      sections.map(() => ({ background: 'rgba(0, 0, 0, 0)', radius: '0px', shadow: 'none' })),
     );
 
     await page.getByRole('button', { name: `Close ${project.title}` }).click();
@@ -439,34 +482,41 @@ test('archive chapters share one continuous paper surface', async ({ page }) => 
   }
 });
 
-test('archive card overlaps the rounded title tab and meets WCAG AA contrast', async ({
-  page,
-}) => {
+test('archive index reflects the chapter currently in view', async ({ page }) => {
+  await page.goto(basePath);
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+  const dialog = page.getByRole('dialog');
+  const indexItems = dialog.locator('.supporting-archive-index button');
+
+  await expect(indexItems.first()).toHaveAttribute('aria-current', 'step');
+  await dialog.locator('[data-archive-section="1"]').evaluate((section) => {
+    section.scrollIntoView({ block: 'start' });
+  });
+
+  await expect(indexItems.nth(1)).toHaveAttribute('aria-current', 'step');
+  await expect(indexItems.first()).not.toHaveAttribute('aria-current', 'step');
+
+  await dialog.evaluate((element) => element.scrollTo({ top: element.scrollHeight }));
+  await expect(indexItems.last()).toHaveAttribute('aria-current', 'step');
+});
+
+test('archive index buttons navigate to every chapter including the outcome', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto(basePath);
   await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
 
-  const geometry = await page.locator('.supporting-archive-desk').evaluate((desk) => {
-    const tabElement = desk.querySelector('.supporting-archive-tab')!;
-    const cardElement = desk.querySelector('.supporting-archive-paper')!;
-    const tab = getComputedStyle(tabElement);
-    const extension = getComputedStyle(tabElement, '::after');
-    const card = getComputedStyle(cardElement);
-    const tabBounds = tabElement.getBoundingClientRect();
-    const cardBounds = cardElement.getBoundingClientRect();
-    return {
-      tabCurve: tab.borderBottomLeftRadius,
-      cardCurve: card.borderTopLeftRadius,
-      extensionContent: extension.content,
-      overlap: tabBounds.bottom - cardBounds.top,
-      background: tab.backgroundColor,
-      foreground: tab.color,
-    };
-  });
+  const dialog = page.getByRole('dialog');
+  const indexButtons = dialog.locator('.supporting-archive-index button');
+  await expect(indexButtons).toHaveCount(6);
 
-  expect(geometry.tabCurve).toBe(geometry.cardCurve);
-  expect(geometry.extensionContent).toBe('none');
-  expect(geometry.overlap).toBe(28);
-  expect(contrastRatio(geometry.background, geometry.foreground)).toBeGreaterThanOrEqual(4.5);
+  await indexButtons.nth(2).click();
+  await expect(indexButtons.nth(2)).toHaveAttribute('aria-current', 'step');
+  await expect(dialog.locator('[data-archive-section="2"]')).toBeInViewport();
+
+  await indexButtons.last().focus();
+  await page.keyboard.press('Enter');
+  await expect(indexButtons.last()).toHaveAttribute('aria-current', 'step');
+  await expect(dialog.locator('[data-archive-section="5"]')).toBeInViewport();
 });
 
 test('archive spine uses the accessible ink palette', async ({ page }) => {
