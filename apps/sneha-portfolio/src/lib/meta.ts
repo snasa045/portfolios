@@ -36,7 +36,7 @@ export const notFoundMeta: PageMeta = {
 };
 
 export const colourPaletteMeta: PageMeta = {
-  title: `Design system — ${profile.name}`,
+  title: `Colour system — ${profile.name}`,
   description: 'Sneha Jadhav’s portfolio colour system, project palettes, and WCAG AA contrast pairings.',
   canonical: canonicalFor('/colour-palette'),
   image: previewFor(),

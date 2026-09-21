@@ -26,7 +26,7 @@ export default function CaseChapterNav({ chapters }: { chapters: Chapter[] }) {
 
   return (
     <nav className="case-chapter-nav" aria-label="Case study chapters">
-      <ol>
+      <ol role="list">
         {chapters.map((chapter, index) => (
           <li key={chapter.id}>
             <a

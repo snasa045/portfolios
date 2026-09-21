@@ -248,6 +248,63 @@ a { color: inherit; }
 .palette-project-preview span { width: 4rem; height: 0.45rem; border-radius: 999px; background: var(--palette-project-accent); }
 .palette-project-details { padding: 1.25rem; }
 .palette-project-details p { margin: 0.4rem 0 0; color: var(--muted); font-size: 0.82rem; }
+.palette-role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.palette-role-card {
+  display: grid;
+  align-content: start;
+  gap: 1.15rem;
+  padding: 1.35rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.palette-role-card header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.palette-role-card h3 { font-size: 1.45rem; }
+.palette-role-card header span {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.palette-role-demo {
+  display: grid;
+  grid-template-columns: 0.36fr minmax(0, 0.64fr);
+  min-height: 6.5rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--palette-role-paper);
+}
+.palette-role-accent { background: var(--palette-role-accent); }
+.palette-role-demo strong {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  color: var(--palette-role-text);
+  text-align: center;
+}
+.palette-role-card dl { display: grid; gap: 0.65rem; margin: 0; }
+.palette-role-card dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--line);
+}
+.palette-role-card dt { color: var(--muted); font-size: 0.78rem; }
+.palette-role-card dd { margin: 0; color: var(--ink); font-size: 0.78rem; font-weight: 650; text-align: right; }
+.palette-role-card > p { margin: 0; color: var(--muted); font-size: 0.85rem; }
 .palette-pairings { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 2rem; }
 .palette-pairing { display: grid; gap: 1rem; padding: 1.5rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
 .palette-sample { padding: 1.25rem; border-radius: 12px; background: var(--palette-sample-bg); color: var(--palette-sample-ink); font-size: 1.05rem; font-weight: 600; }
@@ -1622,7 +1679,7 @@ h3 { font-size: var(--step-h3); }
   .next-case .media { min-height: 280px; }
   .palette-intro, .palette-archive-board { grid-template-columns: 1fr; }
   .palette-swatch-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .palette-project-grid { grid-template-columns: 1fr; }
+  .palette-project-grid, .palette-role-grid { grid-template-columns: 1fr; }
   .palette-archive-spine { min-height: 28rem; }
 }
 

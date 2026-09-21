@@ -158,7 +158,7 @@ export default function SupportingDialog({ project, origin, onClose }: Props) {
               <h3 className="sr-only" id={`supporting-${project.id}-contents`}>
                 Project contents
               </h3>
-              <ol>
+              <ol role="list">
                 {project.sections.map((section, index) => (
                   <li key={section.heading ?? index}>
                     <span>{String(index + 1).padStart(2, '0')}</span>
@@ -206,7 +206,7 @@ export default function SupportingDialog({ project, origin, onClose }: Props) {
                 </span>
                 <div className="supporting-evidence-content">
                   <h3>What came of it</h3>
-                  <ul>
+                  <ul role="list">
                     {project.outcomes.map((outcome) => (
                       <li key={outcome.label}>
                         {outcome.value && <strong>{outcome.value}</strong>} {outcome.label}

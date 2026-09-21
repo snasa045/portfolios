@@ -21,7 +21,7 @@ export default function SupportingWork() {
         <h2>Earlier work and explorations</h2>
         <p>Sprints, concepts, and coursework from 2020. Open one to read the full story.</p>
       </Reveal>
-      <Reveal as="ul" className="supporting" delay={90}>
+      <Reveal as="ul" className="supporting" delay={90} role="list">
         {supportingProjects.map((p) => (
           <li key={p.id} className={active?.project.id === p.id ? 'is-source' : undefined}>
             <h3>

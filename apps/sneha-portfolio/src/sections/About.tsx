@@ -23,7 +23,7 @@ export default function About() {
               <p>Explore the shared colours, project palettes, and accessible contrast pairings.</p>
             </div>
             <Link className="about-system-link" to="/colour-palette">
-              View the portfolio design system
+              View the portfolio colour system
               <span aria-hidden="true">→</span>
             </Link>
           </aside>
@@ -32,7 +32,7 @@ export default function About() {
             {capabilities.map((c) => (
               <div key={c.title}>
                 <h3>{c.title}</h3>
-                <ul className="plain">
+                <ul className="plain" role="list">
                   {c.items.map((i) => (
                     <li key={i}>{i}</li>
                   ))}
@@ -44,7 +44,7 @@ export default function About() {
 
         <div className="about-side">
           <h3>Experience</h3>
-          <ul className="timeline">
+          <ul className="timeline" role="list">
             {experience.map((e) => (
               <li key={`${e.org}-${e.period}`}>
                 <p className="timeline-role">
@@ -58,7 +58,7 @@ export default function About() {
           </ul>
 
           <h3>Education</h3>
-          <ul className="plain">
+          <ul className="plain" role="list">
             {education.map((e) => (
               <li key={e}>{e}</li>
             ))}

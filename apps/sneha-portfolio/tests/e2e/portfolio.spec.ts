@@ -144,14 +144,14 @@ test('client-side 404 metadata removes canonical route fields', async ({ page })
   await expect(page.locator('meta[property="og:url"]')).toHaveCount(0);
 });
 
-test('About links to the design system without adding it to primary navigation', async ({ page }) => {
+test('About links to the colour system without adding it to primary navigation', async ({ page }) => {
   await page.goto(basePath);
   await expect(
-    page.locator('#primary-nav').getByRole('link', { name: 'Design system', exact: true }),
+    page.locator('#primary-nav').getByRole('link', { name: /(?:design|colour) system/i }),
   ).toHaveCount(0);
   await page
     .locator('#about')
-    .getByRole('link', { name: 'View the portfolio design system', exact: true })
+    .getByRole('link', { name: 'View the portfolio colour system', exact: true })
     .click();
 
   await expect(page).toHaveURL(new RegExp(`${basePath}colour-palette/?$`));
@@ -160,6 +160,49 @@ test('About links to the design system without adding it to primary navigation',
   await expect(page.locator('.palette-swatch')).toHaveCount(8);
   await expect(page.locator('.palette-pairing')).toHaveCount(6);
   await expect(page.getByRole('link', { name: 'Back to portfolio' })).toBeVisible();
+});
+
+test('colour system documents accurate project names and accessible colour roles', async ({
+  page,
+}) => {
+  await page.goto(`${basePath}colour-palette`);
+
+  await expect(page.getByText('Rafiki / PHICA', { exact: true })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'PHICA', exact: true })).toHaveCount(2);
+  await expect(page.getByRole('heading', { name: 'Accessible colour roles' })).toBeVisible();
+  await expect(page.locator('.palette-role-card')).toHaveCount(3);
+  await expect(page.getByText('#d8ff43 · 1.14:1 · Decorative only', { exact: true })).toBeVisible();
+  await expect(page.getByText('#4d5a18 · 7.45:1 · AAA', { exact: true })).toBeVisible();
+  await expect(
+    page.locator('.palette-pairing').filter({
+      hasText: 'Case-study chapter navigation, active and hover',
+    }),
+  ).toBeVisible();
+  await expect(
+    page.locator('.palette-swatch').filter({
+      hasText: 'Gradient tint at 12–20% in hero and contact artwork',
+    }),
+  ).toBeVisible();
+});
+
+test('markerless semantic lists retain explicit list roles', async ({ page }) => {
+  await page.goto(basePath);
+
+  for (const selector of ['.supporting', '.capabilities ul', '.timeline', '.about-side .plain']) {
+    await expect(page.locator(selector).first()).toHaveAttribute('role', 'list');
+  }
+
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.locator('.supporting-archive-index ol')).toHaveAttribute('role', 'list');
+  await expect(dialog.locator('.supporting-dialog-outcomes ul')).toHaveAttribute('role', 'list');
+  await dialog.getByRole('button', { name: 'Close Figo Friend' }).click();
+
+  await page.goto(`${basePath}project/moodofy`);
+  await expect(page.locator('.case-chapter-nav ol')).toHaveAttribute('role', 'list');
+
+  await page.goto(`${basePath}colour-palette`);
+  await expect(page.locator('.palette-archive-spine ol')).toHaveAttribute('role', 'list');
 });
 
 test('built HTML metadata matches each public destination', async ({ request }) => {
@@ -182,7 +225,7 @@ test('built HTML metadata matches each public destination', async ({ request }) 
 
   const palette = await responseHtml(request, 'colour-palette');
   expect(palette.response.status()).toBe(200);
-  expect(palette.html).toContain('<title>Design system — Sneha Jadhav</title>');
+  expect(palette.html).toContain('<title>Colour system — Sneha Jadhav</title>');
   expect(palette.html).toContain('Warm editorial');
   expect(palette.html).toContain(
     `<link rel="canonical" href="${siteOrigin}${basePath}colour-palette" />`,
