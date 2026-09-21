@@ -35,8 +35,16 @@ export const notFoundMeta: PageMeta = {
   image: previewFor(),
 };
 
+export const colourPaletteMeta: PageMeta = {
+  title: `Design system — ${profile.name}`,
+  description: 'Sneha Jadhav’s portfolio colour system, project palettes, and WCAG AA contrast pairings.',
+  canonical: canonicalFor('/colour-palette'),
+  image: previewFor(),
+};
+
 export function metaForPath(path: string): PageMeta {
   if (path === '/' || path === '') return homeMeta;
+  if (path === '/colour-palette' || path === '/colour-palette/') return colourPaletteMeta;
 
   const slug = path.match(/^\/project\/([^/]+)\/?$/)?.[1];
   const project = slug && featuredProjects.find((candidate) => candidate.slug === slug);

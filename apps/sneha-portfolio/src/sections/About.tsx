@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { about, assetUrl, capabilities, education, experience } from '../data/portfolio';
 import PortraitTilt from '../components/PortraitTilt';
 import Reveal from '../components/Reveal';
@@ -15,6 +16,17 @@ export default function About() {
           {about.body.map((p) => (
             <p key={p.slice(0, 32)}>{p}</p>
           ))}
+
+          <aside className="about-system-callout">
+            <div>
+              <p className="about-system-label">Behind this portfolio</p>
+              <p>Explore the shared colours, project palettes, and accessible contrast pairings.</p>
+            </div>
+            <Link className="about-system-link" to="/colour-palette">
+              View the portfolio design system
+              <span aria-hidden="true">→</span>
+            </Link>
+          </aside>
 
           <div className="capabilities">
             {capabilities.map((c) => (

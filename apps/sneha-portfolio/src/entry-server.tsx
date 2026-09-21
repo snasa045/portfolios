@@ -13,6 +13,7 @@ export type RouteMeta = PageMeta & {
 
 export const routes: RouteMeta[] = [
   { path: '/', out: 'index.html', ...metaForPath('/') },
+  { path: '/colour-palette', out: 'colour-palette/index.html', ...metaForPath('/colour-palette') },
   ...featuredProjects.map((project) => ({
     path: `/project/${project.slug}`,
     out: `project/${project.slug}/index.html`,

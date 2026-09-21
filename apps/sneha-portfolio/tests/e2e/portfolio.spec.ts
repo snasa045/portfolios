@@ -144,6 +144,24 @@ test('client-side 404 metadata removes canonical route fields', async ({ page })
   await expect(page.locator('meta[property="og:url"]')).toHaveCount(0);
 });
 
+test('About links to the design system without adding it to primary navigation', async ({ page }) => {
+  await page.goto(basePath);
+  await expect(
+    page.locator('#primary-nav').getByRole('link', { name: 'Design system', exact: true }),
+  ).toHaveCount(0);
+  await page
+    .locator('#about')
+    .getByRole('link', { name: 'View the portfolio design system', exact: true })
+    .click();
+
+  await expect(page).toHaveURL(new RegExp(`${basePath}colour-palette/?$`));
+  await expect(page.getByRole('heading', { name: 'Warm editorial' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Portfolio shell' })).toBeVisible();
+  await expect(page.locator('.palette-swatch')).toHaveCount(8);
+  await expect(page.locator('.palette-pairing')).toHaveCount(6);
+  await expect(page.getByRole('link', { name: 'Back to portfolio' })).toBeVisible();
+});
+
 test('built HTML metadata matches each public destination', async ({ request }) => {
   for (const project of projects) {
     const { response, html } = await responseHtml(request, `project/${project.slug}`);
@@ -161,6 +179,14 @@ test('built HTML metadata matches each public destination', async ({ request }) 
   expect(response.status()).toBe(404);
   expect(html).not.toContain('rel="canonical"');
   expect(html).not.toContain('property="og:url"');
+
+  const palette = await responseHtml(request, 'colour-palette');
+  expect(palette.response.status()).toBe(200);
+  expect(palette.html).toContain('<title>Design system — Sneha Jadhav</title>');
+  expect(palette.html).toContain('Warm editorial');
+  expect(palette.html).toContain(
+    `<link rel="canonical" href="${siteOrigin}${basePath}colour-palette" />`,
+  );
 });
 
 test('direction C exposes a three-panel expressive hero and reveal state', async ({ page }) => {
@@ -609,7 +635,12 @@ test('reduced motion keeps content visible and disables motion transforms', asyn
 });
 
 for (const width of [320, 360, 390, 768, 1440]) {
-  for (const route of ['', ...projects.map((project) => `project/${project.slug}`), 'missing-page']) {
+  for (const route of [
+    '',
+    'colour-palette',
+    ...projects.map((project) => `project/${project.slug}`),
+    'missing-page',
+  ]) {
     test(`no horizontal overflow at ${width}px on /${route || 'home'}`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`${basePath}${route}`);

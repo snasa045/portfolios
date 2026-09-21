@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import { profile } from './data/portfolio';
 import { metaForPath } from './lib/meta';
 import NotFound from './pages/NotFound';
+import ColourPalette from './pages/ColourPalette';
 import ProjectDetail from './pages/ProjectDetail';
 import About from './sections/About';
 import Contact from './sections/Contact';
@@ -34,6 +35,7 @@ export default function App() {
       <main id="main" className="container" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/colour-palette" element={<ColourPalette />} />
           <Route path="/project/:slug" element={<ProjectDetail />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
