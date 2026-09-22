@@ -185,6 +185,67 @@ test('colour system documents accurate project names and accessible colour roles
   ).toBeVisible();
 });
 
+test('archive colour reference mirrors the live modal roles', async ({ page }) => {
+  await page.goto(`${basePath}colour-palette`);
+
+  await expect(page.locator('.palette-paper-card')).toHaveCount(0);
+  await expect(page.getByText('Brick on Evidence paper', { exact: true })).toBeVisible();
+  await expect(page.getByText('6.11:1 · AA', { exact: true })).toBeVisible();
+
+  const join = await page.locator('.palette-archive-board').evaluate((board) => {
+    const style = getComputedStyle(board);
+    return {
+      bottomLeftRadius: style.borderBottomLeftRadius,
+      bottomRightRadius: style.borderBottomRightRadius,
+      bottomBorder: style.borderBottomWidth,
+    };
+  });
+  expect(join).toEqual({
+    bottomLeftRadius: '0px',
+    bottomRightRadius: '0px',
+    bottomBorder: '0px',
+  });
+
+  const documented = await page.locator('.palette-archive-board').evaluate((board) => ({
+    spine: getComputedStyle(board.querySelector('.palette-archive-spine')!).backgroundColor,
+    paper: getComputedStyle(board.querySelector('.palette-archive-artboard')!).backgroundColor,
+    divider: getComputedStyle(board.querySelector('.palette-archive-chapter')!).borderTopColor,
+    active: getComputedStyle(
+      board.querySelector('.palette-archive-index [aria-current="step"]')!,
+    ).borderLeftColor,
+    number: getComputedStyle(board.querySelector('.palette-archive-number')!).color,
+  }));
+
+  await page.goto(basePath);
+  await page.getByRole('button', { name: 'Figo Friend — read the full story' }).click();
+  const dialog = page.getByRole('dialog');
+  const live = await dialog.evaluate((element) => ({
+    spine: getComputedStyle(element.querySelector('.supporting-archive-spine')!).backgroundColor,
+    paper: getComputedStyle(element.querySelector('.supporting-archive-desk')!).backgroundColor,
+    divider: getComputedStyle(element.querySelector('[data-archive-section="0"]')!).borderTopColor,
+    active: getComputedStyle(
+      element.querySelector('.supporting-archive-index [aria-current="step"]')!,
+    ).borderLeftColor,
+    number: getComputedStyle(element.querySelector('.supporting-evidence-number')!).color,
+  }));
+
+  expect(documented).toEqual(live);
+});
+
+test('archive colour reference demonstrates active chapter navigation', async ({ page }) => {
+  await page.goto(`${basePath}colour-palette`);
+
+  const index = page.locator('.palette-archive-index');
+  const problem = index.getByRole('button', { name: '01 The problem we picked' });
+  const chatbot = index.getByRole('button', { name: '02 Why a chatbot' });
+
+  await expect(problem).toHaveAttribute('aria-current', 'step');
+  await chatbot.click();
+  await expect(chatbot).toHaveAttribute('aria-current', 'step');
+  await expect(problem).not.toHaveAttribute('aria-current', 'step');
+  await expect(page.locator('.palette-archive-chapter')).toContainText('Why a chatbot');
+});
+
 test('markerless semantic lists retain explicit list roles', async ({ page }) => {
   await page.goto(basePath);
 

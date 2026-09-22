@@ -1,5 +1,6 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { assetUrl } from '../data/portfolio';
 
 const sharedSwatches = [
   ['Ivory', '#faf7f2', 'Primary canvas', 'light'],
@@ -61,12 +62,40 @@ const pairings = [
   ['Ink on Ivory', '#faf7f2', '#1c1917', '16.37:1 · AAA', 'Primary reading text'],
   ['Muted on Ivory', '#faf7f2', '#6b635c', '5.51:1 · AA', 'Secondary copy'],
   ['Pale Terracotta on Ink', '#1c1917', '#e9a38e', '8.41:1 · AAA', 'Spine labels and numbers'],
-  ['Brick on Clay Wash', '#f3eadf', '#a83e26', '5.22:1 · AA', 'Archive emphasis'],
+  ['Brick on Evidence paper', '#fffdf8', '#a83e26', '6.11:1 · AA', 'Archive chapter numbers and outcomes'],
   ['Terracotta on Ivory', '#faf7f2', '#c14a2e', '4.58:1 · AA', 'Links and small labels'],
   ['White on Moodofy accent', '#a83e26', '#ffffff', '6.21:1 · AA', 'Case-study chapter navigation, active and hover'],
 ] as const;
 
+const archiveChapters = [
+  {
+    title: 'The problem we picked',
+    summary: 'A flat reading surface gives the evidence room while the index keeps the story oriented.',
+  },
+  {
+    title: 'Why a chatbot',
+    summary: 'The current chapter uses a pale-terracotta marker without competing with the project content.',
+  },
+  {
+    title: 'What testing changed',
+    summary: 'Quiet dividers and brick numbering create structure without rebuilding the old card stack.',
+  },
+] as const;
+
+const archiveTokens = [
+  ['Spine', '#1c1917'],
+  ['Evidence paper', '#fffdf8'],
+  ['Divider', '#e4ddd2'],
+  ['Interactive accent', '#e9a38e'],
+  ['Evidence number', '#a83e26'],
+  ['Dialog shell', '#e8e1d7'],
+  ['Dialog border', '#cfc5b7'],
+] as const;
+
 export default function ColourPalette() {
+  const [archiveChapter, setArchiveChapter] = useState(0);
+  const activeArchiveChapter = archiveChapters[archiveChapter];
+
   return (
     <article className="palette-page">
       <Link className="palette-back-link" to="/">
@@ -108,33 +137,55 @@ export default function ColourPalette() {
 
       <PaletteSection eyebrow="02 · Supporting work" title="Archive desk">
         <p>
-          Ink anchors the project dossier while warm paper keeps the evidence readable. Pale
-          terracotta is reserved for small accents on the dark spine.
+          Ink anchors a live reading index beside one flat evidence artboard. Pale terracotta marks
+          navigation and focus, while brick numbers the evidence without competing with it.
         </p>
         <div className="palette-archive-board">
           <aside className="palette-archive-spine">
             <span className="palette-archive-file">Project file · #e9a38e</span>
             <h3>Figo Friend</h3>
-            <p>Primary text uses Ivory. Supporting copy uses Soft Ivory #d9cec5.</p>
-            <ol role="list">
-              <li><span>01</span>The problem we picked</li>
-              <li><span>02</span>Why a chatbot</li>
-              <li><span>03</span>What testing changed</li>
-            </ol>
+            <p>Ivory headings and Soft Ivory copy keep the dark spine readable.</p>
+            <nav className="palette-archive-index" aria-label="Archive preview chapters">
+              <ol role="list">
+                {archiveChapters.map((chapter, index) => (
+                  <li key={chapter.title}>
+                    <button
+                      type="button"
+                      aria-current={archiveChapter === index ? 'step' : undefined}
+                      onClick={() => setArchiveChapter(index)}
+                    >
+                      <span>{String(index + 1).padStart(2, '0')}</span>
+                      {chapter.title}
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </nav>
           </aside>
-          <div className="palette-archive-desk">
-            <article className="palette-paper-card">
-              <small>Evidence paper · #fffdf8</small>
-              <h3>Warm, structured evidence</h3>
-              <p>Desk #e8e1d7 · Dialog border #cfc5b7 · Sheet border #d7cfc3 · Brick #a83e26</p>
-            </article>
-            <article className="palette-paper-card">
-              <small>Supporting colours</small>
-              <h3>Distinct, not disconnected</h3>
-              <p>The archive has its own material feel while staying inside the portfolio&apos;s warm editorial language.</p>
+          <div className="palette-archive-artboard">
+            <div className="palette-archive-media" aria-hidden="true">
+              <img src={assetUrl('images/figo-cover-640.webp')} alt="" />
+            </div>
+            <article className="palette-archive-chapter" aria-live="polite">
+              <span className="palette-archive-number">
+                {String(archiveChapter + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <small>Evidence paper · #fffdf8</small>
+                <h3>{activeArchiveChapter.title}</h3>
+                <p>{activeArchiveChapter.summary}</p>
+              </div>
             </article>
           </div>
         </div>
+        <dl className="palette-archive-tokens">
+          {archiveTokens.map(([role, value], index) => (
+            <div className={index > 4 ? 'is-secondary' : undefined} key={role}>
+              <dt>{role}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
       </PaletteSection>
 
       <PaletteSection eyebrow="03 · Project worlds" title="Personality by case study">
